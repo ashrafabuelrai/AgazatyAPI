@@ -35,28 +35,28 @@ namespace Agazaty.Controllers
             _mapper = mapper;
         }
         
-        [Authorize]
+        //[Authorize]
         [HttpPut("Reset-Password")]
         public async Task<IActionResult> ResetPassword(ResetPasswordDTO DTO)
         {
             var result = await _accountService.ResetPassword(DTO);
             return Ok(result);
         }
-        [Authorize]
+        //[Authorize]
         [HttpPost("Forget-Password")]
         public async Task<IActionResult> ForgetPassword(SendOTPDTO DTO)
         {
             var result = await _accountService.ForgetPassword(DTO.Email);
             return Ok(result);
         }
-        [Authorize]
+        //[Authorize]
         [HttpPost("Send-OTP")]
         public async Task<IActionResult> SendOtp(SendOTPDTO DTO)
         {
             var result = await _accountService.SendOTP(DTO.Email);
             return Ok(result);
         }
-        [Authorize]
+        //[Authorize]
         [HttpPost("Change-Password")]
         public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordDTO model)
         {
@@ -76,7 +76,7 @@ namespace Agazaty.Controllers
             }
             return Ok("Password changed successfully.");
         }
-        [Authorize(Roles = "عميد الكلية,أمين الكلية,مدير الموارد البشرية")]
+        //[Authorize(Roles = "عميد الكلية,أمين الكلية,مدير الموارد البشرية")]
         [HttpGet("GetUserById/{userID}")]
         public async Task<IActionResult> GetUserById([FromRoute]string userID)
         {
@@ -104,7 +104,7 @@ namespace Agazaty.Controllers
                 return StatusCode(500, new { message = "An error occurred while processing your request.", error = ex.Message });
             }
         }
-        [Authorize(Roles = "عميد الكلية,أمين الكلية,مدير الموارد البشرية")]
+        //[Authorize(Roles = "عميد الكلية,أمين الكلية,مدير الموارد البشرية")]
         [HttpGet("GetUserByNationalId/{NationalId}")]
         public async Task<IActionResult> GetUserByNationalId(string NationalId)
         {
@@ -129,7 +129,7 @@ namespace Agazaty.Controllers
                 return StatusCode(500, new { message = "An error occurred while processing your request.", error = ex.Message });
             }
         }
-        [Authorize(Roles = "عميد الكلية,أمين الكلية,مدير الموارد البشرية")]
+        //[Authorize(Roles = "عميد الكلية,أمين الكلية,مدير الموارد البشرية")]
         [HttpGet("GetAllActiveUsers")]
         public async Task<IActionResult> GetAllActiveUsers()
         {
@@ -156,7 +156,7 @@ namespace Agazaty.Controllers
                 return StatusCode(500, new { message = "An error occurred while processing your request.", error = ex.Message });
             }
         }
-        [Authorize(Roles = "عميد الكلية,أمين الكلية,مدير الموارد البشرية")]
+        //[Authorize(Roles = "عميد الكلية,أمين الكلية,مدير الموارد البشرية")]
         [HttpGet("GetAllNonActiveUsers")]
         public async Task<IActionResult> GetAllNonActiveUsers()
         {
@@ -183,7 +183,7 @@ namespace Agazaty.Controllers
                 return StatusCode(500, new { message = "An error occurred while processing your request.", error = ex.Message });
             }
         }
-        [Authorize]
+        //[Authorize]
         [HttpGet("GetAllAvailabelCoworkers/{userId}")]
         public async Task<IActionResult> GetAllAvailableCoworkers(string userId)
         {
@@ -213,7 +213,7 @@ namespace Agazaty.Controllers
                 return StatusCode(500, new { message = "An error occurred while processing your request.", error = ex.Message });
             }
         }
-        [Authorize(Roles = "عميد الكلية,أمين الكلية,مدير الموارد البشرية")]
+        //[Authorize(Roles = "عميد الكلية,أمين الكلية,مدير الموارد البشرية")]
         [HttpGet("GetAllUsersByDepartmentId/{DepartmentId}")]
         public async Task<IActionResult> GetAllUsersByDepartmentId(int DepartmentId)
         {
@@ -245,7 +245,7 @@ namespace Agazaty.Controllers
                 return StatusCode(500, new { message = "An error occurred while processing your request.", error = ex.Message });
             }
         }        
-        [Authorize(Roles = "مدير الموارد البشرية")]
+        //[Authorize(Roles = "مدير الموارد البشرية")]
         [HttpPost("CreateUser/{RoleName}")]
         public async Task<IActionResult> CreateUser([FromRoute]string RoleName, [FromBody] CreateUserDTO model) 
         {
@@ -303,7 +303,7 @@ namespace Agazaty.Controllers
                 return StatusCode(500, new { message = "An error occurred while processing your request.", error = ex.Message });
             }
         }
-        [AllowAnonymous]
+        //[AllowAnonymous]
         [HttpPost("UserLogin")]
         public async Task<IActionResult> Login([FromBody] LogInUserDTO model)
         {
@@ -333,7 +333,7 @@ namespace Agazaty.Controllers
                 return StatusCode(500, new { message = "An error occurred while processing your request.", error = ex.Message });
             }
         }
-        [Authorize(Roles = "مدير الموارد البشرية")]
+        //[Authorize(Roles = "مدير الموارد البشرية")]
         [HttpPut("UpdateUser/{userid}/{RoleName}")]
         public async Task<IActionResult> UdpateUser(string userid, string RoleName, [FromBody]UpdateUserDTO model)
         {
@@ -418,7 +418,7 @@ namespace Agazaty.Controllers
                 return StatusCode(500, new { message = "An error occurred while processing your request.", error = ex.Message });
             }
         }
-        [Authorize]
+        //[Authorize]
         [HttpPut("UdpateUserForUser/{userid}")]
         public async Task<IActionResult> UdpateUserForUser(string userid, [FromBody] UpdateUserDTOforuser model)
         {
@@ -458,7 +458,7 @@ namespace Agazaty.Controllers
                 return StatusCode(500, new { message = "An error occurred while processing your request.", error = ex.Message });
             }
         }
-        [Authorize(Roles = "مدير الموارد البشرية")]
+        //[Authorize(Roles = "مدير الموارد البشرية")]
         [HttpDelete("DeleteUser/{userid}")]
         public async Task<IActionResult> DeleteUser(string userid)
         {

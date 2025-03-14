@@ -1,5 +1,6 @@
 ﻿using Agazaty.Data.Enums;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -31,9 +32,7 @@ namespace Agazaty.Models
         public string NationalID { get; set; }
         public int position { get; set; }
         [Required]
-        [Range(0, int.MaxValue)]
         public int NormalLeavesCount { get; set; }
-        [Range(0, int.MaxValue)]
         public int CasualLeavesCount { get; set; }
         public int SickLeavesCount { get; set; }
         [ForeignKey("Department")]
@@ -67,6 +66,9 @@ namespace Agazaty.Models
         public int TakenNormalLeavesCount_81Before1Years { get; set; }
         [DefaultValue(0)]
         public int TakenNormalLeavesCount { get; set; }
+        public string? Street {  get; set; }
+        public string? governorate { get; set; }
+        public string? State { get; set; }
 
         //[DefaultValue(true)]
         //public bool IntializationCheck { get; set; }

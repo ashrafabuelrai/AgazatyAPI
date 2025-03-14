@@ -6,6 +6,10 @@ namespace Agazaty.Data.DTOs.AccountDTOs
     public class UserDTO
     {
         public string Id { get; set; }
+        public string? FirstName { get; set; }
+        public string? SecondName { get; set; }
+        public string? ThirdName { get; set; }
+        public string? ForthName { get; set; }
         public string? FullName { get; set; }
         public string? DepartmentName { get; set; }
         public int SickLeavesCount { get; set; }
@@ -17,5 +21,12 @@ namespace Agazaty.Data.DTOs.AccountDTOs
         public int NormalLeavesCount_81Before1Years { get; set; }
         public int HowManyDaysFrom81And47 { get; set; }
         public int YearsOfWork { get; set; }
+        public string? NationalID { get; set; }
+        public string? PhoneNumber { get; set; }
+        public string? Email { get; set; }
+        public DateTime HireDate { get; set; }
+        public string? Street { get; set; }
+        public string? governorate { get; set; }
+        public string? State { get; set; }
     }
 }
