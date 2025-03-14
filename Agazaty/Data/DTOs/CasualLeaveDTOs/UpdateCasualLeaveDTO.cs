@@ -8,6 +8,8 @@ namespace Agazaty.Data.DTOs.CasualLeaveDTOs
         public DateTime StartDate { get; set; }
         [Required]
         public DateTime EndDate { get; set; }
+        public string? Notes { get; set; }
+
         [Required]
         public string UserId { get; set; }
     }

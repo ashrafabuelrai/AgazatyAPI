@@ -68,6 +68,40 @@ namespace Agazaty.Controllers
             }
         }
         //[Authorize(Roles = "عميد الكلية,أمين الكلية,مدير الموارد البشرية")]
+        [HttpGet("GetAllNormalLeaves")]
+        public async Task<IActionResult> GetAllNormalLeaves()
+        {
+            try
+            {
+
+                var NormalLeaves = await _base.GetAll();
+                if (!NormalLeaves.Any())
+                {
+                    return NotFound(new { message = "No normal leaves found." });
+                }
+                var leaves = new List<NormalLeaveDTO>();
+                foreach (var normalleave in NormalLeaves)
+                {
+                    var leave = _mapper.Map<NormalLeaveDTO>(normalleave);
+                    var user = await _accountService.FindById(normalleave.UserID);
+                    var coworker = await _accountService.FindById(normalleave.Coworker_ID);
+                    var generalManager = await _accountService.FindById(normalleave.General_ManagerID); ;
+                    var directManager = await _accountService.FindById(normalleave.Direct_ManagerID);
+                    leave.GeneralManagerName = $"{generalManager.FirstName} {generalManager.SecondName} {generalManager.ThirdName} {generalManager.ForthName}";
+                    leave.DirectManagerName = $"{directManager.FirstName} {directManager.SecondName} {directManager.ThirdName} {directManager.ForthName}";
+                    leave.UserName = $"{user.FirstName} {user.SecondName} {user.ThirdName} {user.ForthName}";
+                    leave.CoworkerName = $"{coworker.FirstName} {coworker.SecondName} {coworker.ThirdName} {coworker.ForthName}";
+
+                    leaves.Add(leave);
+                }
+                return Ok(leaves);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while processing your request.", error = ex.Message });
+            }
+        }
+        //[Authorize(Roles = "عميد الكلية,أمين الكلية,مدير الموارد البشرية")]
         [HttpGet("GetAllAcceptedNormalLeaves")]
         public async Task<IActionResult> GetAllAcceptedNormalLeaves()
         {
@@ -532,7 +566,6 @@ namespace Agazaty.Controllers
                 var errors = new List<string>();
                 DateTime today = DateTime.Today;
                 int year = DateTime.Now.Year;
-
                 // Check if the user already has a pending leave request
                 bool hasPendingLeave = _appDbContext.NormalLeaves
                 .Any(l => l.UserID == model.UserID && l.ResponseDone == false);
@@ -580,6 +613,7 @@ namespace Agazaty.Controllers
                 normalLeave.LeaveStatus = LeaveStatus.Waiting;
                 normalLeave.Holder = Holder.CoWorker;
                 normalLeave.RejectedBy = RejectedBy.NotRejected;
+                normalLeave.Days = ((model.EndDate - model.StartDate).Days)+1;
                 if (await _accountService.IsInRoleAsync(user, "هيئة تدريس"))
                 {
                     var res = await _accountService.GetAllUsersInRole("عميد الكلية");

@@ -24,6 +24,7 @@ namespace Agazaty.Models
         public DateTime StartDate { get; set; }
         [Required]
         public DateTime EndDate { get; set; }
+        public int Days { get; set; }
         public string? NotesFromEmployee { get; set; }
         public int Year { get; set; }
         public bool Accepted { get; set; } = false;

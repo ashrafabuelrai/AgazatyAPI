@@ -1,4 +1,5 @@
 ﻿using NormalLeaveTask.Models;
+using Org.BouncyCastle.Asn1.Mozilla;
 
 namespace Agazaty.Data.DTOs.NormalLeaveDTOs
 {
@@ -14,6 +15,7 @@ namespace Agazaty.Data.DTOs.NormalLeaveDTOs
         public DateTime RequestDate { get; set; }
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
+        public int Days { get; set; }
         public int Year { get; set; }
         public string? NotesFromEmployee { get; set; }
         public bool Accepted { get; set; } = false;
