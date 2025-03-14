@@ -36,9 +36,7 @@ namespace Agazaty.Data.DTOs.AccountDTOs
         public DateTime DateOfBirth { get; set; }
         [Required]
         public int position { get; set; }
-        [Range(0, int.MaxValue)]
         public int NormalLeavesCount { get; set; }
-        [Range(0, int.MaxValue)]
         public int CasualLeavesCount { get; set; }
         public int SickLeavesCount { get; set; }
         public int HistoryNormalLeavesCount { get; set; }

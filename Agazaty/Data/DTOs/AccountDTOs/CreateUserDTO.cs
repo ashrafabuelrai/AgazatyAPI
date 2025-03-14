@@ -41,10 +41,7 @@ namespace Agazaty.Data.DTOs.AccountDTOs
         public string NationalID { get; set; }
         [Required]
         public int position { get; set; }
-        [Required]
-        [Range(0, int.MaxValue)]
         public int NormalLeavesCount { get; set; }
-        [Range(0, int.MaxValue)]
         public int CasualLeavesCount { get; set; }
         public int SickLeavesCount { get; set; }
         public int? Departement_ID { get; set; }
