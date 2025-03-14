@@ -134,6 +134,39 @@ namespace Agazaty.Controllers
                 return StatusCode(500, new { message = "An error occurred while processing your request.", error = ex.Message });
             }
         }
+        //[Authorize(Roles = "عميد الكلية,أمين الكلية,مدير الموارد البشرية")]
+        [HttpGet("GetAllWaitingNormalLeaves")]
+        public async Task<IActionResult> GetAllWaitingNormalLeaves()
+        {
+            try
+            {
+                var NormalLeaves = await _base.GetAll(n =>n.LeaveStatus==LeaveStatus.Waiting);
+                if (!NormalLeaves.Any())
+                {
+                    return NotFound(new { message = "No waiting normal leaves found." });
+                }
+                var leaves = new List<NormalLeaveDTO>();
+                foreach (var normalleave in NormalLeaves)
+                {
+                    var leave = _mapper.Map<NormalLeaveDTO>(normalleave);
+                    var user = await _accountService.FindById(normalleave.UserID);
+                    var coworker = await _accountService.FindById(normalleave.Coworker_ID);
+                    var generalManager = await _accountService.FindById(normalleave.General_ManagerID); ;
+                    var directManager = await _accountService.FindById(normalleave.Direct_ManagerID);
+                    leave.GeneralManagerName = $"{generalManager.FirstName} {generalManager.SecondName} {generalManager.ThirdName} {generalManager.ForthName}";
+                    leave.DirectManagerName = $"{directManager.FirstName} {directManager.SecondName} {directManager.ThirdName} {directManager.ForthName}";
+                    leave.UserName = $"{user.FirstName} {user.SecondName} {user.ThirdName} {user.ForthName}";
+                    leave.CoworkerName = $"{coworker.FirstName} {coworker.SecondName} {coworker.ThirdName} {coworker.ForthName}";
+
+                    leaves.Add(leave);
+                }
+                return Ok(leaves);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while processing your request.", error = ex.Message });
+            }
+        }
         //[Authorize]
         [HttpGet("AllNormalLeavesByUserId/{userID}")]
         public async Task<IActionResult> GetAllNormalLeavesByUserID(string userID)
