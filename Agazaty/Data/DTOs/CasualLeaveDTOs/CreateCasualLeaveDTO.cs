@@ -11,6 +11,5 @@ namespace Agazaty.Data.DTOs.CasualLeaveDTOs
         [Required]
         public string UserId { get; set; }
         public string? Notes { get; set; }
-
     }
 }

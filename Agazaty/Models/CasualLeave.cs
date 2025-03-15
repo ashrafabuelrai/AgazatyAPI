@@ -12,6 +12,7 @@ namespace Agazaty.Models
         public DateTime EndDate { get; set; }
         public int Year { get; set; }
         public string? Notes { get; set; }
+        public int Days { get; set; }
         [Required]
         [ForeignKey("User")]
         public string UserId { get; set; }

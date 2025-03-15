@@ -170,6 +170,7 @@ namespace Agazaty.Controllers
                 var casualLeave = _mapper.Map<CasualLeave>(model);
                 casualLeave.Year = model.StartDate.Year;
                 casualLeave.RequestDate = DateTime.UtcNow.Date;
+                casualLeave.Days = (model.EndDate - model.StartDate).Days + 1;
                 user.CasualLeavesCount -= (int)((casualLeave.EndDate - casualLeave.StartDate).TotalDays + 1) ;
                 await _accountService.Update(user);
                 await _base.Add(casualLeave);
