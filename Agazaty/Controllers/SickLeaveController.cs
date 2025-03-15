@@ -133,6 +133,32 @@ namespace Agazaty.Controllers
             }
         }
         //[Authorize(Roles = "مدير الموارد البشرية")]
+        [HttpGet("GetAllAcceptedSickLeaves")]
+        public async Task<IActionResult> GetAllAcceptedSickLeaves()
+        {
+            try
+            {
+                var waitingSickLeaves = await _base.GetAll(s => s.RespononseDone == true);
+
+                if (waitingSickLeaves.Any())
+                {
+                    var leaves = _mapper.Map<IEnumerable<SickLeaveDTO>>(waitingSickLeaves);
+                    foreach (var leave in leaves)
+                    {
+                        var user = await _accoutnService.FindById(leave.UserID);
+                        leave.UserName = $"{user.FirstName} {user.SecondName} {user.ThirdName} {user.ForthName}";
+                    }
+                    return Ok(leaves);
+                }
+
+                return NotFound("No accepted sick leaves found.");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while processing your request.", error = ex.Message });
+            }
+        }
+        //[Authorize(Roles = "مدير الموارد البشرية")]
         [HttpGet("GetAllWaitingSickLeaves")]
         public async Task<IActionResult> GetAllWaitingSickLeaves()
         {
@@ -229,8 +255,8 @@ namespace Agazaty.Controllers
             }
         }
         //[Authorize]
-        [HttpPut("UpdateSickLeave/{leaveID}")]
-        public async Task<IActionResult> UpdateSickLeave(int leaveID, [FromBody]UpdateSickLeaveDTO model)
+        [HttpPut("UpdateSickLeaveDays/{leaveID}")]
+        public async Task<IActionResult> UpdateSickLeaveDays(int leaveID, [FromBody]UpdateSickLeaveDTO model)
         {
             if (leaveID <= 0)
             {
@@ -247,7 +273,7 @@ namespace Agazaty.Controllers
                     return BadRequest(ModelState);
                 }
 
-                var sickleave = await _base.Get(s => s.Id == leaveID&&s.RespononseDone==false);
+                var sickleave = await _base.Get(s => s.Id == leaveID&&s.RespononseDone==true);
 
                 if (sickleave == null)
                 {
@@ -260,6 +286,8 @@ namespace Agazaty.Controllers
 
                 var leave = _mapper.Map<SickLeaveDTO>(sickleave);
                 var user = await _accoutnService.FindById(leave.UserID);
+                user.SickLeavesCount +=(int)sickleave.Days;
+                await _accoutnService.Update(user);
                 leave.UserName = $"{user.FirstName} {user.SecondName} {user.ThirdName} {user.ForthName}";
                 return Ok(new { Message = "Update is succeeded.", Leave = leave });
             }

@@ -241,6 +241,17 @@ namespace Agazaty.Data.Services.Implementation
         {
             var user = _mapper.Map<ApplicationUser>(model);
             user.Active = true;
+            var init = user.HireDate;
+            var today = DateTime.UtcNow;
+            user.YearsOfWork =today.Year - init.Year;
+            if (init.Month < 7)
+            {
+                user.YearsOfWork++;
+            }
+            if (today.Month < 7)
+            {
+                user.YearsOfWork--;
+            }
             //var hireDuration = (DateTime.UtcNow.Date - user.HireDate).TotalDays;
 
             var ageInYears = DateTime.UtcNow.Year - user.DateOfBirth.Year;

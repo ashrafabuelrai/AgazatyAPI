@@ -76,7 +76,7 @@ namespace Agazaty.Controllers
             }
             return Ok("Password changed successfully.");
         }
-        //[Authorize(Roles = "عميد الكلية,أمين الكلية,مدير الموارد البشرية")]
+        //[Authorize]
         [HttpGet("GetUserById/{userID}")]
         public async Task<IActionResult> GetUserById([FromRoute]string userID)
         {
@@ -98,6 +98,27 @@ namespace Agazaty.Controllers
                     ReturnedUser.DepartmentName = dept.Name;
                 }
                 return Ok(ReturnedUser);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while processing your request.", error = ex.Message });
+            }
+        }
+        //[Authorize]
+        [HttpGet("GetRoleOfUser/{userID}")]
+        public async Task<IActionResult> GetRoleOfUser([FromRoute] string userID)
+        {
+            if (string.IsNullOrWhiteSpace(userID))
+                return BadRequest(new { message = "Invalid user ID." });
+            try
+            {
+                var user = await _accountService.FindById(userID);
+                if (user == null)
+                {
+                    return NotFound(new { Message = "User is not found." });
+                }
+                var role =await _accountService.GetFirstRole(user);
+                return Ok(role);
             }
             catch (Exception ex)
             {
@@ -275,7 +296,6 @@ namespace Agazaty.Controllers
                         if (await _deptBase.Get(d => d.Id == model.Departement_ID) is null)
                             return BadRequest(new { Message = "Invalid department!" });
                     }
-
                     var res = await _accountService.Create(RoleName,model);
                     if (res.Succeeded)
                     {

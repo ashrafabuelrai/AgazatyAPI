@@ -55,8 +55,6 @@ namespace Agazaty.Data.DTOs.AccountDTOs
         public int NormalLeavesCount_81Before1Years { get; set; }
         [DefaultValue(0)]
         public int HowManyDaysFrom81And47 { get; set; }
-        [DefaultValue(0)]
-        public int YearsOfWork { get; set; }
         public string? Street { get; set; }
         public string? governorate { get; set; }
         public string? State { get; set; }

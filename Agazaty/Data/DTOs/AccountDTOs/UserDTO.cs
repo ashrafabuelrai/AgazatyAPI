@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using Agazaty.Data.Enums;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
 namespace Agazaty.Data.DTOs.AccountDTOs
@@ -21,6 +22,7 @@ namespace Agazaty.Data.DTOs.AccountDTOs
         public int NormalLeavesCount_81Before1Years { get; set; }
         public int HowManyDaysFrom81And47 { get; set; }
         public int YearsOfWork { get; set; }
+        public NormalLeaveSection? LeaveSection { get; set; }
         public string? NationalID { get; set; }
         public string? PhoneNumber { get; set; }
         public string? Email { get; set; }

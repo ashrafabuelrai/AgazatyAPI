@@ -719,7 +719,7 @@ namespace Agazaty.Controllers
 
                 int returnedDays = (int)((NormalLeave.EndDate - model.EndDate).TotalDays + 1);
                 NormalLeave.EndDate = model.EndDate;
-
+                NormalLeave.Days = ((model.EndDate - NormalLeave.StartDate).Days + 1);
                 if (user.Counts == CountsFromNormalLeaveTypes.FromNormalLeave)
                 {
                     user.NormalLeavesCount += returnedDays;
