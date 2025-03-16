@@ -11,6 +11,8 @@ namespace Agazaty.Data.DTOs.SickLeaveDTOs
         public string? MedicalCommitteAddress { get; set; }
         public bool RespononseDone { get; set; }
         public int Year { get; set; }
+        public DateTime? StartDate { get; set; }
+        public DateTime? EndDate { get; set; }
         public string? Street { get; set; }
         public string? governorate { get; set; }
         public string? State { get; set; }

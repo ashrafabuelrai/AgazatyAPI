@@ -118,7 +118,7 @@ namespace Agazaty.Controllers
                     return NotFound(new { Message = "User is not found." });
                 }
                 var role =await _accountService.GetFirstRole(user);
-                return Ok(role);
+                return Ok(new{role});
             }
             catch (Exception ex)
             {

@@ -256,7 +256,7 @@ namespace Agazaty.Controllers
         }
         //[Authorize]
         [HttpPut("UpdateSickLeaveDays/{leaveID}")]
-        public async Task<IActionResult> UpdateSickLeaveDays(int leaveID, [FromBody]UpdateSickLeaveDTO model)
+        public async Task<IActionResult> UpdateSickLeaveDate(int leaveID, [FromBody]UpdateSickLeaveDTO model)
         {
             if (leaveID <= 0)
             {
@@ -279,9 +279,25 @@ namespace Agazaty.Controllers
                 {
                     return NotFound("SickLeave not found.");
                 }
+                var errors = new List<string>();
+                DateTime today = DateTime.Today;
+                if (model.EndDate < today)
+                    errors.Add("The leave period has already passed. Please select future dates.");
+
+                if (model.StartDate < today)
+                    errors.Add("The start date cannot be in the past. Please select today or a future date.");
+
+                if (model.StartDate > model.EndDate)
+                    errors.Add("Start date cannot be after the end date.");
+
+                if (DateTime.UtcNow.Date > model.StartDate)
+                    errors.Add("Request date cannot be after the start date.");
+
+                if (errors.Any())
+                    return BadRequest(new { messages = errors });
 
                 _mapper.Map(model, sickleave);
-
+                sickleave.Days = ((model.EndDate - model.StartDate).Days) + 1;
                 await _base.Update(sickleave);
 
                 var leave = _mapper.Map<SickLeaveDTO>(sickleave);
