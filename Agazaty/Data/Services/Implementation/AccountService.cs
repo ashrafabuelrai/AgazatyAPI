@@ -50,36 +50,35 @@ namespace Agazaty.Data.Services.Implementation
         public async Task<ApplicationUser> FindById(string UserId)
         {
             var user = await _userManager.FindByIdAsync(UserId);
-            if (user != null)
-            {
-                if (user.Active == true) return user;
-                return null;
-            }
-            return null;
+            //if (user != null)
+            //{
+            //    if (user.Active == true) return user;
+            //}
+            return user;
         }
         public async Task<ApplicationUser> FindByNationalId(string NationalId)
         {
-            return await _appDbContext.Users.Where(u => u.NationalID == NationalId && u.Active==true).FirstOrDefaultAsync();
+            return await _appDbContext.Users.Where(u => u.NationalID == NationalId).FirstOrDefaultAsync();
         }
         public async Task<ApplicationUser> FindByName(string UserName)
         {
             var user = await _userManager.FindByNameAsync(UserName);
-            if (user != null)
-            {
-                if (user.Active == true) return user;
-                return null;
-            }
-            return null;
+            //if (user != null)
+            //{
+            //    if (user.Active == true) return user;
+            //    return null;
+            //}
+            return user;
         }
         public async Task<ApplicationUser> FindByEmail(string email)
         {
             var user = await _userManager.FindByEmailAsync(email);
-            if (user != null)
-            {
-                if (user.Active == true) return user;
-                return null;
-            }
-            return null;
+            //if (user != null)
+            //{
+            //    if (user.Active == true) return user;
+            //    return null;
+            //}
+            return user;
         }
         public async Task<IEnumerable<ApplicationUser>> GetAllActiveUsers()
         {
@@ -253,7 +252,7 @@ namespace Agazaty.Data.Services.Implementation
                 user.YearsOfWork--;
             }
             //var hireDuration = (DateTime.UtcNow.Date - user.HireDate).TotalDays;
-
+            // validation on leaves count from front
             var ageInYears = DateTime.UtcNow.Year - user.DateOfBirth.Year;
             if (DateTime.UtcNow.Month < user.DateOfBirth.Month ||
                (DateTime.UtcNow.Month == user.DateOfBirth.Month && DateTime.UtcNow.Day < user.DateOfBirth.Day))
@@ -321,7 +320,9 @@ namespace Agazaty.Data.Services.Implementation
                 FullName = $"{user.ForthName} {user.ThirdName} {user.SecondName} {user.FirstName}",
                 NormalLeavesCount = user.NormalLeavesCount,
                 CasualLeavesCount = user.CasualLeavesCount,
-                SickLeavesCount = user.SickLeavesCount
+                SickLeavesCount = user.SickLeavesCount,
+                Email=user.Email,
+                Id=user.Id,
             };
             if (user.Departement_ID != null)
             {
@@ -339,15 +340,18 @@ namespace Agazaty.Data.Services.Implementation
         {
             return await _userManager.DeleteAsync(user);
         }
-        public async Task<AuthModel> ForgetPassword(string Email)
+        public async Task<AuthModel> ForgetPassword(SendOTPDTO DTO)
         {
-            var Account = await FindByEmail(Email);
+            var Account = await FindByEmail(DTO.Email);
             if (Account == null)
             {
                 return new AuthModel { Message = "user not found" };
             }
-
-            return await SendOTP(Email);
+            if (Account.UserName != DTO.UserName)
+            {
+                return new AuthModel { Message = "Invalid Request" };
+            }
+            return await SendOTP(DTO.Email);
         }
         public async Task<AuthModel> ResetPassword(ResetPasswordDTO DTO)
         {

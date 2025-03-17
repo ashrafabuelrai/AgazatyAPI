@@ -6,5 +6,7 @@ namespace Agazaty.Data.Email.DTOs
     {
         [Required, EmailAddress]
         public string Email { get; set; }
+        [Required]
+        public string UserName { get; set; }
     }
 }

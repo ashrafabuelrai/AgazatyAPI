@@ -144,11 +144,13 @@ namespace Agazaty.Controllers
                     return NotFound(new { Message = "Department is not found." });
                 }
                 var IsAlreadyManager = await _base.Get(d => d.ManagerId == model.ManagerId);
-                if (department != IsAlreadyManager)
+                if(IsAlreadyManager != null)
                 {
-                    return BadRequest(new { Message = "This Manager already in a head of a another department." });
+                    if (department.Id != IsAlreadyManager.Id)
+                    {
+                        return BadRequest(new { Message = "This Manager already in a head of a another department." });
+                    }
                 }
-
                 _mapper.Map(model, department);
                 await _base.Update(department);
 

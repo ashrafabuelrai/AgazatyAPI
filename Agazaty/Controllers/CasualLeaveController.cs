@@ -153,7 +153,8 @@ namespace Agazaty.Controllers
                 if (allCasualLeave != null && allCasualLeave.Count() !=0)
                 {
                     var lastCasualLeave = allCasualLeave.OrderByDescending(c => c.EndDate).FirstOrDefault();
-                    if (model.StartDate <= lastCasualLeave.EndDate && model.EndDate>=lastCasualLeave.StartDate)
+                   
+                    if ((model.StartDate <= lastCasualLeave.EndDate && model.EndDate>=lastCasualLeave.StartDate)||(model.EndDate>=lastCasualLeave.StartDate&&model.StartDate<=lastCasualLeave.StartDate))
                     {
                         return BadRequest(new { Message = "you already have a casual leave in this date." });
                     }

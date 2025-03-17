@@ -562,7 +562,6 @@ namespace Agazaty.Controllers
                     return BadRequest(new { Message = "You can't because the limit to you are 60 days." });
                 }
 
-
                 var errors = new List<string>();
                 DateTime today = DateTime.Today;
                 int year = DateTime.Now.Year;
@@ -641,7 +640,7 @@ namespace Agazaty.Controllers
                     // if أمين الكلية made a leave request
                     var res = await _accountService.GetAllUsersInRole("عميد الكلية");
                     var Dean = res.FirstOrDefault();
-                    if (Dean == null) { return BadRequest(new { Message = "There no user with the Dean role" }); }
+                    if (Dean == null) { return BadRequest(new {Message = "There no user with the Dean role" }); }
                     normalLeave.General_ManagerID = Dean.Id;
                     normalLeave.Direct_ManagerID = Dean.Id;
                 }
@@ -649,7 +648,7 @@ namespace Agazaty.Controllers
                 {
                     var res = await _accountService.GetAllUsersInRole("أمين الكلية");
                     var Supervisor = res.FirstOrDefault();
-                    if (Supervisor == null) { return BadRequest(new { Message = "There no user with the Supervisor role" }); }
+                    if (Supervisor == null) { return BadRequest(new {Message = "There no user with the Supervisor role" }); }
                     normalLeave.General_ManagerID = Supervisor.Id;
                     normalLeave.Direct_ManagerID = Supervisor.Id;
                 }
@@ -1144,11 +1143,10 @@ namespace Agazaty.Controllers
                     var userr = await _accountService.FindById(NormalLeave.UserID);
                     var IsdeptManager = await _departmentBase.Get(d => d.ManagerId == userr.Id);
                     bool cheackRole = await _accountService.IsInRoleAsync(userr, "أمين الكلية");
-                    if (cheackRole || IsdeptManager != null)
+                    bool cheackRoleHr = await _accountService.IsInRoleAsync(userr, "مدير الموارد البشرية");
+                    if (cheackRole || IsdeptManager != null || cheackRoleHr)
                         NormalLeave.DirectManager_Decision = true;
                 }
-
-
                 await _base.Update(NormalLeave);
 
                 var leave = _mapper.Map<NormalLeaveDTO>(NormalLeave);

@@ -5,6 +5,8 @@ namespace Agazaty.Data.DTOs.AccountDTOs
     public class ChangePasswordDTO
     {
         [Required]
+        public string UseId {  get; set; }
+        [Required]
         public string CurrentPassword { get; set; }
 
         [Required]
