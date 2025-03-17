@@ -149,7 +149,16 @@ namespace Agazaty.Controllers
                     return BadRequest();
                 }
                 ApplicationUser user = await _accountService.FindById(model.UserId);
-                if(((model.EndDate-model.StartDate).TotalDays + 1) > user.CasualLeavesCount)
+                var allCasualLeave = await _base.GetAll(u => u.UserId == user.Id);
+                if (allCasualLeave != null && allCasualLeave.Count() !=0)
+                {
+                    var lastCasualLeave = allCasualLeave.OrderByDescending(c => c.EndDate).FirstOrDefault();
+                    if (model.StartDate <= lastCasualLeave.EndDate && model.EndDate>=lastCasualLeave.StartDate)
+                    {
+                        return BadRequest(new { Message = "you already have a casual leave in this date." });
+                    }
+                }
+                if (((model.EndDate-model.StartDate).TotalDays + 1) > user.CasualLeavesCount)
                 {
                     return BadRequest(new {Message = $"Request can't be done , The number of days available to you are {user.CasualLeavesCount}."});
                 }
@@ -165,7 +174,6 @@ namespace Agazaty.Controllers
                 {
                     return BadRequest(new {Message= "StartDate should be less than EndDate." });
                 }
-
 
                 var casualLeave = _mapper.Map<CasualLeave>(model);
                 casualLeave.Year = model.StartDate.Year;
