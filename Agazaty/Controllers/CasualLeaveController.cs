@@ -1,5 +1,6 @@
 ﻿using Agazaty.Data.Base;
 using Agazaty.Data.DTOs.CasualLeaveDTOs;
+using Agazaty.Data.Services;
 using Agazaty.Data.Services.Interfaces;
 using Agazaty.Models;
 using AutoMapper;
@@ -18,11 +19,13 @@ namespace Agazaty.Controllers
         private readonly IEntityBaseRepository<CasualLeave> _base;
         private readonly IAccountService _accountService;
         private readonly IMapper _mapper;
-        public CasualLeaveController(IMapper mapper,IEntityBaseRepository<CasualLeave> Ebase, IAccountService accountService)
+        private readonly ILeaveValidationService _leaveValidationService;
+        public CasualLeaveController(IMapper mapper, IEntityBaseRepository<CasualLeave> Ebase, IAccountService accountService, ILeaveValidationService leaveValidationService)
         {
             _mapper = mapper;
             _base = Ebase;
             _accountService = accountService;
+            _leaveValidationService = leaveValidationService;
         }
         //[Authorize]
         [HttpGet("GetCasualLeaveById/{leaveID:int}", Name = "GetCasualLeave")]
@@ -148,17 +151,26 @@ namespace Agazaty.Controllers
                 {
                     return BadRequest();
                 }
-                ApplicationUser user = await _accountService.FindById(model.UserId);
-                var allCasualLeave = await _base.GetAll(u => u.UserId == user.Id);
-                if (allCasualLeave != null && allCasualLeave.Count() !=0)
+                if (await _leaveValidationService.IsSameLeaveOverlapping(model.UserId, model.StartDate, model.EndDate, "CasualLeave"))
                 {
-                    var lastCasualLeave = allCasualLeave.OrderByDescending(c => c.EndDate).FirstOrDefault();
-                   
-                    if ((model.StartDate <= lastCasualLeave.EndDate && model.EndDate>=lastCasualLeave.StartDate)||(model.EndDate>=lastCasualLeave.StartDate&&model.StartDate<=lastCasualLeave.StartDate))
-                    {
-                        return BadRequest(new { Message = "you already have a casual leave in this date." });
-                    }
+                    return BadRequest("You already have a Casual leave in this period.");
                 }
+
+                if (await _leaveValidationService.IsLeaveOverlapping(model.UserId, model.StartDate, model.EndDate, "CasualLeave"))
+                {
+                    return BadRequest("You already have a different type of leave in this period.");
+                }
+                ApplicationUser user = await _accountService.FindById(model.UserId);
+                //var allCasualLeave = await _base.GetAll(u => u.UserId == user.Id);
+                //if (allCasualLeave != null && allCasualLeave.Count() !=0)
+                //{
+                //    var lastCasualLeave = allCasualLeave.OrderByDescending(c => c.EndDate).FirstOrDefault();
+                   
+                //    if ((model.StartDate <= lastCasualLeave.EndDate && model.EndDate>=lastCasualLeave.StartDate)||(model.EndDate>=lastCasualLeave.StartDate&&model.StartDate<=lastCasualLeave.StartDate))
+                //    {
+                //        return BadRequest(new { Message = "you already have a casual leave in this date." });
+                //    }
+                //}
                 if (((model.EndDate-model.StartDate).TotalDays + 1) > user.CasualLeavesCount)
                 {
                     return BadRequest(new {Message = $"Request can't be done , The number of days available to you are {user.CasualLeavesCount}."});

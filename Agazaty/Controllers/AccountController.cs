@@ -57,6 +57,13 @@ namespace Agazaty.Controllers
             var result = await _accountService.SendOTP(DTO.Email);
             return Ok(result);
         }
+        [HttpPost("Verify-OTP")]
+        public async Task<IActionResult> VerifyOtp(VerifyOTPDTO verifyOtpDTO)
+        {
+            var result = await _accountService.VerifyOtpAsync(verifyOtpDTO.Email, verifyOtpDTO.EnteredOtp);
+            if (!result.IsAuthenticated) return BadRequest(result);
+            return Ok(result);
+        }
         //[Authorize]
         [HttpPost("Change-Password")]
         public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordDTO model)
@@ -476,6 +483,9 @@ namespace Agazaty.Controllers
 
                     user.Email = model.Email;
                     user.PhoneNumber = model.PhoneNumber;
+                    user.Street = model.Street;
+                    user.Governorate= model.Governorate;
+                    user.State= model.State;
 
                     var res = await _accountService.Update(user);
                     if (res.Succeeded)

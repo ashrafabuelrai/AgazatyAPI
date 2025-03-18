@@ -67,7 +67,7 @@ namespace Agazaty.Models
         [DefaultValue(0)]
         public int TakenNormalLeavesCount { get; set; }
         public string? Street {  get; set; }
-        public string? governorate { get; set; }
+        public string? Governorate { get; set; }
         public string? State { get; set; }
 
         //[DefaultValue(true)]

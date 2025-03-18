@@ -2,12 +2,14 @@
 using Agazaty.Data.DTOs.CasualLeaveDTOs;
 using Agazaty.Data.DTOs.RoleDTOs;
 using Agazaty.Data.DTOs.SickLeaveDTOs;
+using Agazaty.Data.Services;
 using Agazaty.Data.Services.Interfaces;
 using Agazaty.Models;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Org.BouncyCastle.Asn1.Ocsp;
 using System.Data;
 using System.Net;
 
@@ -20,11 +22,13 @@ namespace Agazaty.Controllers
         private readonly IEntityBaseRepository<SickLeave> _base;
         private readonly IAccountService _accoutnService;
         private readonly IMapper _mapper;
-        public SickLeaveController(IAccountService accoutnService, IMapper mapper, IEntityBaseRepository<SickLeave> Ebase)
+        private readonly ILeaveValidationService _leaveValidationService;
+        public SickLeaveController(IAccountService accoutnService, IMapper mapper, IEntityBaseRepository<SickLeave> Ebase, ILeaveValidationService leaveValidationService)
         {
             _mapper = mapper;
             _base = Ebase;
             _accoutnService = accoutnService;
+            _leaveValidationService = leaveValidationService;
         }
         //[Authorize]
         [HttpGet("GetSickLeaveById/{leaveID:int}")]
@@ -198,7 +202,6 @@ namespace Agazaty.Controllers
                 {
                     return BadRequest(ModelState);
                 }
-
                 SickLeave sickLeave = _mapper.Map<SickLeave>(model);
                 sickLeave.RequestDate = DateTime.UtcNow.Date;
                 sickLeave.Year = sickLeave.RequestDate.Year;
@@ -272,9 +275,18 @@ namespace Agazaty.Controllers
                 {
                     return BadRequest(ModelState);
                 }
-
+                //var userleave =await _base.Get(l=>l.Id==leaveID);
+     
                 var sickleave = await _base.Get(s => s.Id == leaveID&&s.RespononseDone==true);
-
+                var userid = sickleave.UserID;
+                if (await _leaveValidationService.IsSameLeaveOverlapping(userid, model.StartDate, model.EndDate, "SickLeave"))
+                {
+                    return BadRequest("You already have a Sick leave in this period.");
+                }
+                if (await _leaveValidationService.IsLeaveOverlapping(userid, model.StartDate, model.EndDate, "SickLeave"))
+                {
+                    return BadRequest("You already have a different type of leave in this period.");
+                }
                 if (sickleave == null)
                 {
                     return NotFound("SickLeave not found.");

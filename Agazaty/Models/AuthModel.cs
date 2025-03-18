@@ -12,7 +12,8 @@ namespace Agazaty.Models
         public int NormalLeavesCount { get; set; }
         public int CasualLeavesCount { get; set; }
         public int PermitLeavesCount { get; set; }
-        public List<string> Roles { get; set; }
+        public string RoleId { get; set; }
+        public string RoleName { get; set; }
         public string Message { get; set; }
         public bool IsAuthenticated { get; set; }
         public string Token { get; set; }

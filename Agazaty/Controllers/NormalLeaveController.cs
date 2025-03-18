@@ -27,7 +27,8 @@ namespace Agazaty.Controllers
         private readonly IMapper _mapper;
         private readonly AppDbContext _appDbContext;
         private readonly IEmailService _EmailService;
-        public NormalLeaveController(AppDbContext appDbContext, IEntityBaseRepository<NormalLeave> Ebase, IAccountService accountService, IMapper mapper, IEntityBaseRepository<Department> departmentBase, IEmailService EmailService)
+        private readonly ILeaveValidationService _leaveValidationService;
+        public NormalLeaveController(AppDbContext appDbContext, IEntityBaseRepository<NormalLeave> Ebase, IAccountService accountService, IMapper mapper, IEntityBaseRepository<Department> departmentBase, IEmailService EmailService, ILeaveValidationService leaveValidationService)
         {
             _base = Ebase;
             _accountService = accountService;
@@ -35,6 +36,7 @@ namespace Agazaty.Controllers
             _appDbContext = appDbContext;
             _departmentBase = departmentBase;
             _EmailService = EmailService;
+            _leaveValidationService = leaveValidationService;
         }
         //[Authorize]
         [HttpGet("GetNormalLeaveById/{leaveID:int}")]
@@ -543,6 +545,14 @@ namespace Agazaty.Controllers
                 if (!ModelState.IsValid)
                 {
                     return BadRequest(ModelState);
+                }
+                if (await _leaveValidationService.IsSameLeaveOverlapping(model.UserID, model.StartDate, model.EndDate, "CasualLeave"))
+                {
+                    return BadRequest("You already have a Normal leave in this period.");
+                }
+                if (await _leaveValidationService.IsLeaveOverlapping(model.UserID, model.StartDate, model.EndDate, "CasualLeave"))
+                {
+                    return BadRequest("You already have a different type of leave in this period.");
                 }
                 var cowrker = await _accountService.FindById(model.Coworker_ID);
                 var user = await _accountService.FindById(model.UserID);

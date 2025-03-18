@@ -35,5 +35,6 @@ namespace Agazaty.Data.Services.Interfaces
         Task<AuthModel> ForgetPassword(SendOTPDTO DTO);
         Task<AuthModel> ResetPassword(ResetPasswordDTO DTO);
         Task<AuthModel> SendOTP(string email);
+        Task<AuthModel> VerifyOtpAsync(string Email, string enteredOtp);
     }
 }

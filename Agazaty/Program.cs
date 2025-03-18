@@ -10,6 +10,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Agazaty.Data.Email;
 using Agazaty.Data.Services.AutomaticInitializationService;
+using Agazaty.Data.Services;
 
 namespace Agazaty
 {
@@ -42,6 +43,7 @@ namespace Agazaty
             builder.Services.AddScoped<IAccountService, AccountService>();
             builder.Services.AddScoped<IRoleService, RoleService>();
             builder.Services.AddScoped<IEmailService, EmailService>();
+            builder.Services.AddScoped<ILeaveValidationService, LeaveValidationService>();
 
             builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
 
