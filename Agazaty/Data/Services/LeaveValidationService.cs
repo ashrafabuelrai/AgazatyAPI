@@ -1,57 +1,104 @@
 ﻿using Agazaty.Data.Services.Interfaces;
 using Agazaty.Models;
 using Microsoft.EntityFrameworkCore;
+using System.Data;
+using Dapper;
+
 
 namespace Agazaty.Data.Services
 {
     public class LeaveValidationService: ILeaveValidationService
     {
         private readonly AppDbContext _context;
+        private readonly IDbConnection _dbConnection;
 
-        public LeaveValidationService(AppDbContext context)
+
+        public LeaveValidationService(AppDbContext context, IDbConnection dbConnection)
         {
             _context = context;
+            _dbConnection = dbConnection;
         }
 
         public async Task<bool> IsLeaveOverlapping(string userId, DateTime startDate, DateTime endDate, string leaveType)
         {
-            return (leaveType != "SickLeave" && await _context.SickLeaves.AnyAsync(l =>
-                       l.UserID == userId &&
-                       ((l.StartDate <= endDate && l.EndDate >= startDate) || (l.EndDate >= startDate && l.StartDate <= startDate))))
-            //l.StartDate <= endDate &&
-            //l.EndDate >= startDate))
-            ||
-                (leaveType != "NormalLeave" && await _context.NormalLeaves.AnyAsync(l =>
-                       l.ResponseDone==true &&
-                       l.UserID == userId &&
-                       ((l.StartDate <= endDate && l.EndDate >= startDate) || (l.EndDate >= startDate && l.StartDate <= startDate))) )
-            ||
-                (leaveType != "CasualLeave" && await _context.CasualLeaves.AnyAsync(l =>
-                       l.UserId == userId && 
-                       ((l.StartDate <= endDate && l.EndDate >= startDate) || (l.EndDate >= startDate && l.StartDate <= startDate))));
+            //((l.StartDate <= endDate && l.EndDate >= startDate) ||
+            //(l.EndDate >= startDate && l.StartDate <= startDate))))
+            string sql = @"
+             SELECT TOP 1 OverlapExists FROM (
+                SELECT 1 AS OverlapExists FROM SickLeaves 
+                WHERE @LeaveType != 'SickLeave' AND UserID = @userId 
+                AND ((StartDate <= @endDate AND StartDate >= @startDate) OR (EndDate >= @endDate AND StartDate <= @startDate) OR (@startDate<=EndDate AND EndDate<=@endDate))
+                UNION ALL
+
+                SELECT 1 AS OverlapExists FROM NormalLeaves
+                WHERE @LeaveType != 'NormalLeave' AND UserID = @userId
+                AND ((StartDate <= @endDate AND StartDate >= @startDate) OR (EndDate >= @endDate AND StartDate <= @startDate) OR (@startDate<=EndDate AND EndDate<=@endDate))
+                AND (Accepted = 1)
+
+                UNION ALL
+
+                SELECT 1 AS OverlapExists FROM CasualLeaves 
+                WHERE @LeaveType != 'CasualLeave' AND UserID = @userId 
+                AND ((StartDate <= @endDate AND StartDate >= @startDate) OR (EndDate >= @endDate AND StartDate <= @startDate) OR (@startDate<=EndDate AND EndDate<=@endDate))
+            ) AS OverlappingLeaves";
+            var result = await _dbConnection.QueryFirstOrDefaultAsync<int?>(sql, new
+            {
+                userId = userId,
+                startDate = startDate,
+                endDate = endDate,
+                LeaveType = leaveType
+            });
+
+            return result.HasValue; // Returns true if an overlapping leave exists
         }
         public async Task<bool> IsSameLeaveOverlapping(string userId, DateTime startDate, DateTime endDate, string leaveType)
         {
             if(leaveType == "SickLeave")
             {
-                return (leaveType == "SickLeave" && await _context.SickLeaves.AnyAsync(l =>
-                      l.UserID == userId &&
-                      ((l.StartDate <= endDate && l.EndDate >= startDate) || (l.EndDate >= startDate && l.StartDate <= startDate))));
+                string sql = @" SELECT 1 FROM SickLeaves 
+                WHERE @LeaveType = 'SickLeave' AND UserID = @userId 
+                AND ((StartDate <= @endDate AND StartDate >= @startDate) OR (EndDate >= @endDate AND StartDate <= @startDate) OR (@startDate<=EndDate AND EndDate<=@endDate))";
+                var result = await _dbConnection.QueryFirstOrDefaultAsync<int?>(sql, new
+                {
+                    userId= userId,
+                    startDate = startDate,
+                    endDate = endDate,
+                    LeaveType = leaveType
+                });
+                return result.HasValue;
+                //(leaveType == "SickLeave" && await _context.SickLeaves.AnyAsync(l =>
+                //     l.UserID == userId &&
+                //     ((l.StartDate <= endDate && l.EndDate >= startDate) || (l.EndDate >= startDate && l.StartDate <= startDate))));
             }
-            if(leaveType == "NormalLeave")
+            if (leaveType == "CasualLeave")
             {
-                return (leaveType == "NormalLeave" && await _context.NormalLeaves.AnyAsync(l =>
-                       l.ResponseDone == true &&
-                       l.UserID == userId &&
-                       ((l.StartDate <= endDate && l.EndDate >= startDate) || (l.EndDate >= startDate && l.StartDate <= startDate))));
+                string sql = @" SELECT 1 FROM CasualLeaves
+                WHERE @LeaveType = 'CasualLeave' AND UserID = @userId 
+                AND ((StartDate <= @endDate AND StartDate >= @startDate) OR (EndDate >= @endDate AND StartDate <= @startDate) OR (@startDate<=EndDate AND EndDate<=@endDate))";
+                var result = await _dbConnection.QueryFirstOrDefaultAsync<int?>(sql, new
+                {
+                    userId = userId,
+                    startDate = startDate,
+                    endDate = endDate,
+                    LeaveType = leaveType
+                });
+                return result.HasValue;
             }
-            if(leaveType == "CasualLeave")
+            if (leaveType == "NormalLeave")
             {
-                return (leaveType != "CasualLeave" && await _context.CasualLeaves.AnyAsync(l =>
-                       l.UserId == userId &&
-                       ((l.StartDate <= endDate && l.EndDate >= startDate) || (l.EndDate >= startDate && l.StartDate <= startDate))));
+                string sql = @" SELECT 1 FROM NormalLeaves
+                WHERE @LeaveType = 'NormalLeave' AND UserID = @userId AND (Accepted = 1)
+                AND ((StartDate <= @endDate AND StartDate >= @startDate) OR (EndDate >= @endDate AND StartDate <= @startDate) OR (@startDate<=EndDate AND EndDate<=@endDate))";
+                var result = await _dbConnection.QueryFirstOrDefaultAsync<int?>(sql, new
+                {
+                    userId= userId,
+                    startDate = startDate,
+                    endDate = endDate,
+                    LeaveType = leaveType
+                });
+                return result.HasValue;
             }
-
+            
             return false;
                 
         }

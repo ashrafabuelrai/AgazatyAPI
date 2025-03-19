@@ -335,7 +335,17 @@ namespace Agazaty.Data.Services.Implementation
         }
         public async Task<IdentityResult> Update(ApplicationUser user)
         {
-
+            var init = user.HireDate;
+            var today = DateTime.UtcNow;
+            user.YearsOfWork = today.Year - init.Year;
+            if (init.Month < 7)
+            {
+                user.YearsOfWork++;
+            }
+            if (today.Month < 7)
+            {
+                user.YearsOfWork--;
+            }
             return await _userManager.UpdateAsync(user);
         }
         public async Task<IdentityResult> Delete(ApplicationUser user)

@@ -1,4 +1,5 @@
-﻿using Agazaty.Data.DTOs.DepartmentDTOs;
+﻿using Agazaty.Data.DTOs.AccountDTOs;
+using Agazaty.Data.DTOs.DepartmentDTOs;
 using Agazaty.Data.DTOs.PermitLeavesDTOs;
 using Agazaty.Data.DTOs.RoleDTOs;
 using Agazaty.Data.Services.Interfaces;
@@ -19,6 +20,7 @@ namespace Agazaty.Controllers
         private readonly IRoleService _roleService;
         private readonly IAccountService _accountService;
         private readonly IMapper _mapper;
+       
         public RoleController(IRoleService roleService, IMapper mapper, IAccountService accountService)
         {
             _roleService = roleService;
@@ -36,6 +38,21 @@ namespace Agazaty.Controllers
                 var role = await _roleService.FindById(roleId);
                 if(role==null) return NotFound(new {Message="No role with this id is found."});
                 return Ok(_mapper.Map<RoleDTO>(role));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while processing your request.", error = ex.Message });
+            }
+        }
+        //[Authorize(Roles = "مدير الموارد البشرية")]
+        [HttpGet("GetAllUsersInRole/{RoleName}")]
+        public async Task<IActionResult> GetAllUsersInRoles(string RoleName)
+        {
+            try
+            {
+                var users = await _accountService.GetAllUsersInRole(RoleName);
+                if (users.Count() == 0) return NotFound(new {Message = "no users found in this role"});
+                return Ok(_mapper.Map<IEnumerable<UserDTO>>(users)); 
             }
             catch (Exception ex)
             {

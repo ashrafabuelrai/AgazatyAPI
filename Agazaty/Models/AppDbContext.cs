@@ -13,7 +13,14 @@ namespace Agazaty.Models
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+            modelBuilder.Entity<SickLeave>()
+                    .HasIndex(l => new { l.UserID, l.StartDate, l.EndDate });
 
+            modelBuilder.Entity<NormalLeave>()
+                .HasIndex(l => new { l.UserID, l.StartDate, l.EndDate });
+
+            modelBuilder.Entity<CasualLeave>()
+                .HasIndex(l => new { l.UserId, l.StartDate, l.EndDate });
         }
         public DbSet<ApplicationUser> Users { get; set; }  
         public DbSet<IdentityRole> Roles { get; set; }

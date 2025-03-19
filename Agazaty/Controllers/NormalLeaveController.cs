@@ -435,7 +435,9 @@ namespace Agazaty.Controllers
                     leave.DirectManagerName = $"{directManager.FirstName} {directManager.SecondName} {directManager.ThirdName} {directManager.ForthName}";
                     leave.UserName = $"{user.FirstName} {user.SecondName} {user.ThirdName} {user.ForthName}";
                     leave.CoworkerName = $"{coworker.FirstName} {coworker.SecondName} {coworker.ThirdName} {coworker.ForthName}";
-
+                    leave.PhoneNumber = user.PhoneNumber;
+                    var department = await _departmentBase.Get(d => d.Id == user.Departement_ID);
+                    leave.DepartmentName = department.Name;
                     leaves.Add(leave);
                 }
                 return Ok(leaves);
@@ -477,7 +479,9 @@ namespace Agazaty.Controllers
                     leave.DirectManagerName = $"{directManager.FirstName} {directManager.SecondName} {directManager.ThirdName} {directManager.ForthName}";
                     leave.UserName = $"{user.FirstName} {user.SecondName} {user.ThirdName} {user.ForthName}";
                     leave.CoworkerName = $"{coworker.FirstName} {coworker.SecondName} {coworker.ThirdName} {coworker.ForthName}";
-
+                    leave.PhoneNumber = user.PhoneNumber;
+                    var department = await _departmentBase.Get(d => d.Id == user.Departement_ID);
+                    leave.DepartmentName = department.Name;
                     leaves.Add(leave);
                 }
                 return Ok(leaves);
@@ -546,11 +550,18 @@ namespace Agazaty.Controllers
                 {
                     return BadRequest(ModelState);
                 }
-                if (await _leaveValidationService.IsSameLeaveOverlapping(model.UserID, model.StartDate, model.EndDate, "CasualLeave"))
+                // Check if the user already has a pending leave request
+                bool hasPendingLeave = _appDbContext.NormalLeaves
+                .Any(l => l.UserID == model.UserID && l.ResponseDone == false);
+                if (hasPendingLeave)
+                {
+                    return BadRequest(new { message = "You already have a pending leave request that has not been processed yet." });
+                }
+                if (await _leaveValidationService.IsSameLeaveOverlapping(model.UserID, model.StartDate, model.EndDate, "NormalLeave"))
                 {
                     return BadRequest("You already have a Normal leave in this period.");
                 }
-                if (await _leaveValidationService.IsLeaveOverlapping(model.UserID, model.StartDate, model.EndDate, "CasualLeave"))
+                if (await _leaveValidationService.IsLeaveOverlapping(model.UserID, model.StartDate, model.EndDate, "NormalLeave"))
                 {
                     return BadRequest("You already have a different type of leave in this period.");
                 }
@@ -575,13 +586,7 @@ namespace Agazaty.Controllers
                 var errors = new List<string>();
                 DateTime today = DateTime.Today;
                 int year = DateTime.Now.Year;
-                // Check if the user already has a pending leave request
-                bool hasPendingLeave = _appDbContext.NormalLeaves
-                .Any(l => l.UserID == model.UserID && l.ResponseDone == false);
-                if (hasPendingLeave)
-                {
-                    return BadRequest(new { message = "You already have a pending leave request that has not been processed yet." });
-                }
+                
 
                 // Check if the new leave period overlaps with any existing approved leave
                 bool hasOverlappingLeave = _appDbContext.NormalLeaves
@@ -750,7 +755,6 @@ namespace Agazaty.Controllers
                     user.NormalLeavesCount += returnedDays;
                     returnedDays = 0;
                 }
-
                 else if (user.Counts == CountsFromNormalLeaveTypes.From81Before2Years)
                 {
                     if (returnedDays >= user.TakenNormalLeavesCount_81Before2Years)

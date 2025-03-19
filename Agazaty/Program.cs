@@ -11,6 +11,9 @@ using System.Text;
 using Agazaty.Data.Email;
 using Agazaty.Data.Services.AutomaticInitializationService;
 using Agazaty.Data.Services;
+using System.Data;
+using System.Data.Common;
+using Microsoft.Data.SqlClient;
 
 namespace Agazaty
 {
@@ -44,6 +47,8 @@ namespace Agazaty
             builder.Services.AddScoped<IRoleService, RoleService>();
             builder.Services.AddScoped<IEmailService, EmailService>();
             builder.Services.AddScoped<ILeaveValidationService, LeaveValidationService>();
+            builder.Services.AddTransient<IDbConnection>(sp =>
+              new SqlConnection(builder.Configuration.GetConnectionString("DefaultConnection")));
 
             builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
 

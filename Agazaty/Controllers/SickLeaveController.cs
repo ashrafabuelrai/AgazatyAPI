@@ -23,12 +23,14 @@ namespace Agazaty.Controllers
         private readonly IAccountService _accoutnService;
         private readonly IMapper _mapper;
         private readonly ILeaveValidationService _leaveValidationService;
-        public SickLeaveController(IAccountService accoutnService, IMapper mapper, IEntityBaseRepository<SickLeave> Ebase, ILeaveValidationService leaveValidationService)
+        private readonly AppDbContext _appDbContext;
+        public SickLeaveController(IAccountService accoutnService, IMapper mapper, IEntityBaseRepository<SickLeave> Ebase, ILeaveValidationService leaveValidationService, AppDbContext appDbContext)
         {
             _mapper = mapper;
             _base = Ebase;
             _accoutnService = accoutnService;
             _leaveValidationService = leaveValidationService;
+            _appDbContext = appDbContext;
         }
         //[Authorize]
         [HttpGet("GetSickLeaveById/{leaveID:int}")]
@@ -201,6 +203,13 @@ namespace Agazaty.Controllers
                 if (!ModelState.IsValid)
                 {
                     return BadRequest(ModelState);
+                }
+                // Check if the user already has a pending leave request
+                bool hasPendingLeave = _appDbContext.SickLeaves
+                .Any(l => l.UserID == model.UserID && l.RespononseDone == false);
+                if (hasPendingLeave)
+                {
+                    return BadRequest(new { message = "You already have a pending leave request that has not been processed yet." });
                 }
                 SickLeave sickLeave = _mapper.Map<SickLeave>(model);
                 sickLeave.RequestDate = DateTime.UtcNow.Date;

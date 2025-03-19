@@ -25,6 +25,8 @@ namespace Agazaty.Data.DTOs.NormalLeaveDTOs
         public bool CoWorker_Decision { get; set; } = false;
         public string? DisapproveReasonOfGeneral_Manager { get; set; }
         public string? DisapproveReasonOfDirect_Manager { get; set; }   
+        public string PhoneNumber { get; set; }
+        public string DepartmentName { get; set; }
         public LeaveStatus LeaveStatus { get; set; }
         public Holder Holder { get; set; }
         public RejectedBy RejectedBy { get; set; }
