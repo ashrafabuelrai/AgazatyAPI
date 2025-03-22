@@ -14,6 +14,7 @@ using NormalLeaveTask.Models;
 using System.Data;
 using static System.Net.WebRequestMethods;
 using System.Security.Principal;
+using System.Runtime.InteropServices;
 
 namespace Agazaty.Controllers
 {
@@ -38,6 +39,31 @@ namespace Agazaty.Controllers
             _EmailService = EmailService;
             _leaveValidationService = leaveValidationService;
         }
+        //private static Dictionary<int, List<DateTime>> officialHolidaysByYear = new Dictionary<int, List<DateTime>>();
+        //// ✅ 1. إدخال الإجازات الرسمية لسنة معينة من الـ HR
+        //[HttpPost("add-holidays/{year}")]
+        //public IActionResult AddOfficialHolidays(int year, [FromBody] List<DateTime> holidays)
+        //{
+        //    if (!officialHolidaysByYear.ContainsKey(year))
+        //    {
+        //        officialHolidaysByYear[year] = new List<DateTime>();
+        //    }
+
+        //    officialHolidaysByYear[year].AddRange(holidays);
+        //    return Ok(new { message = $"تمت إضافة الإجازات الرسمية لسنة {year} بنجاح!", holidays });
+        //}
+        //// ✅ 2. عرض الإجازات الرسمية لسنة معينة
+        ////[HttpGet("holidays/{year}")]
+        //public IActionResult GetOfficialHolidays(int year)
+        //{
+        //    if (!officialHolidaysByYear.ContainsKey(year))
+        //    {
+        //        return NotFound(new { message = $"لا توجد إجازات مسجلة لسنة {year}." });
+        //    }
+
+        //    return Ok(new { year, holidays = officialHolidaysByYear[year] });
+        //}
+
         //[Authorize]
         [HttpGet("GetNormalLeaveById/{leaveID:int}")]
         public async Task<IActionResult> GetNormalLeaveById(int leaveID)
@@ -571,13 +597,13 @@ namespace Agazaty.Controllers
                 {
                     return BadRequest(new { Message = "Invalid user id or coworker id." });
                 }
-
-                if (((model.EndDate - model.StartDate).TotalDays + 1) > user.NormalLeavesCount + user.NormalLeavesCount_81Before1Years + user.NormalLeavesCount_81Before2Years + user.NormalLeavesCount_81Before3Years + user.NormalLeavesCount_47)
+                int LeaveDays = await _leaveValidationService.CalculateLeaveDays(model.StartDate, model.EndDate);
+                if (LeaveDays > user.NormalLeavesCount + user.NormalLeavesCount_81Before1Years + user.NormalLeavesCount_81Before2Years + user.NormalLeavesCount_81Before3Years + user.NormalLeavesCount_47)
                 {
                     return BadRequest(new { Message = "no enough days" });
                 }
 
-                int DifferenceDays = (int)(model.EndDate - model.StartDate).TotalDays + 1 - user.NormalLeavesCount;
+                int DifferenceDays = LeaveDays- user.NormalLeavesCount;
                 if (user.HowManyDaysFrom81And47 + DifferenceDays > 60)
                 {
                     return BadRequest(new { Message = "You can't because the limit to you are 60 days." });
@@ -627,7 +653,7 @@ namespace Agazaty.Controllers
                 normalLeave.LeaveStatus = LeaveStatus.Waiting;
                 normalLeave.Holder = Holder.CoWorker;
                 normalLeave.RejectedBy = RejectedBy.NotRejected;
-                normalLeave.Days = ((model.EndDate - model.StartDate).Days)+1;
+                normalLeave.Days = LeaveDays;
                 if (await _accountService.IsInRoleAsync(user, "هيئة تدريس"))
                 {
                     var res = await _accountService.GetAllUsersInRole("عميد الكلية");
@@ -730,10 +756,9 @@ namespace Agazaty.Controllers
                 NormalLeave.NotesFromEmployee = model.NotesFromEmployee;
                 //user.NormalLeavesCount += (int)((NormalLeave.EndDate - model.EndDate).TotalDays + 1);
 
-
-                int returnedDays = (int)((NormalLeave.EndDate - model.EndDate).TotalDays + 1);
+                int returnedDays = await _leaveValidationService.CalculateLeaveDays(NormalLeave.EndDate,model.EndDate);
                 NormalLeave.EndDate = model.EndDate;
-                NormalLeave.Days = ((model.EndDate - NormalLeave.StartDate).Days) + 1;
+                NormalLeave.Days = await _leaveValidationService.CalculateLeaveDays(model.EndDate,NormalLeave.StartDate);
                 if (user.Counts == CountsFromNormalLeaveTypes.FromNormalLeave)
                 {
                     user.NormalLeavesCount += returnedDays;
@@ -919,13 +944,15 @@ namespace Agazaty.Controllers
                 // Update properties
                 NormalLeave.GeneralManager_Decision = model.GeneralManagerDecision;
                 NormalLeave.ResponseDone = true;
+
                 if (model.GeneralManagerDecision == true)
                 {
+                    int LeaveDays=await _leaveValidationService.CalculateLeaveDays(NormalLeave.StartDate, NormalLeave.EndDate);
                     NormalLeave.Accepted = true;
-                    if (((NormalLeave.EndDate - NormalLeave.StartDate).TotalDays + 1) > user.NormalLeavesCount)
+                    if (LeaveDays > user.NormalLeavesCount)
                     {                       
                         user.TakenNormalLeavesCount += user.NormalLeavesCount;
-                        int DifferenceDays = (int)(NormalLeave.EndDate - NormalLeave.StartDate).TotalDays + 1 - user.NormalLeavesCount;
+                        int DifferenceDays = LeaveDays- user.NormalLeavesCount;
                         user.NormalLeavesCount = 0;
                         user.HowManyDaysFrom81And47 += DifferenceDays;
                         if (DifferenceDays > user.NormalLeavesCount_81Before3Years)
@@ -979,7 +1006,7 @@ namespace Agazaty.Controllers
                     }
                     else
                     {
-                        user.TakenNormalLeavesCount += (int)((NormalLeave.EndDate - NormalLeave.StartDate).TotalDays + 1);
+                        user.TakenNormalLeavesCount +=LeaveDays;
                         user.NormalLeavesCount -= user.TakenNormalLeavesCount;
                         user.Counts = CountsFromNormalLeaveTypes.FromNormalLeave;
                     }

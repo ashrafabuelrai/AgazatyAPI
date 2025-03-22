@@ -3,6 +3,8 @@ using Agazaty.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
 using Dapper;
+using System.Linq;
+
 
 
 namespace Agazaty.Data.Services
@@ -101,6 +103,31 @@ namespace Agazaty.Data.Services
             
             return false;
                 
+        }
+        // ✅ 3. ميثود مستقلة لحساب عدد أيام الإجازة بعد استبعاد الجمعة، السبت، والإجازات الرسمية
+        public async Task<int>  CalculateLeaveDays(DateTime startDate, DateTime endDate)
+        {
+            // التأكد من أن تاريخ البداية ليس بعد تاريخ النهاية
+            if (startDate > endDate)
+            {
+                throw new ArgumentException("تاريخ البداية يجب أن يكون قبل تاريخ النهاية.");
+            }
+            int leaveDays = 0;
+
+            for (DateTime date = startDate; date <= endDate; date = date.AddDays(1))
+            {
+                // استبعاد الجمعة والسبت
+                if (date.DayOfWeek == DayOfWeek.Friday || date.DayOfWeek == DayOfWeek.Saturday)
+                {
+                    continue;
+                }
+                leaveDays++;
+            }
+            return leaveDays;
+            //return  Enumerable.Range(0, (endDate - startDate).Days + 1)
+            //                 .Select(i => startDate.AddDays(i))
+            //                 .Count(d => d.DayOfWeek != DayOfWeek.Friday  // استبعاد الجمعة
+            //                          && d.DayOfWeek != DayOfWeek.Saturday); // استبعاد السبت
         }
     }
 }

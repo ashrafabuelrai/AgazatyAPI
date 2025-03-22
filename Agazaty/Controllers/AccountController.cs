@@ -282,12 +282,12 @@ namespace Agazaty.Controllers
             {
                 if (ModelState.IsValid)
                 {
-                    if(RoleName=="عميد الكلية" || RoleName == "أمين الكلية")
+                    if (RoleName == "عميد الكلية" || RoleName == "أمين الكلية" || RoleName == "مدير الموارد البشرية") // ??????????
                     {
                         var list = await _accountService.GetAllUsersInRole(RoleName);
-                        if (list.Any()) return BadRequest(new { Message = $"There is already user has the {RoleName} role, , this role should be only assigned to not more than 1 user." });
+                        if (list.Any()) return BadRequest(new { Message = $"There is already user has the {RoleName} role, this role should be only assigned to not more than 1 user." });
                     }
-                    if (await _accountService.FindByEmail(model.Email) is not null)
+                        if (await _accountService.FindByEmail(model.Email) is not null)
                         return BadRequest(new { Message = "Email is already registered!" });
 
                     if (await _accountService.FindByNationalId(model.NationalID) is not null)
@@ -376,13 +376,16 @@ namespace Agazaty.Controllers
                     var user = await _accountService.FindById(userid);
                     if (user == null) return NotFound(new { Message = "User is not found" });
 
-                    if (RoleName == "عميد الكلية" || RoleName == "أمين الكلية")
+                    if (RoleName == "عميد الكلية" || RoleName == "أمين الكلية" || RoleName == "مدير الموارد البشرية") // ??????????
                     {
                         var list = await _accountService.GetAllUsersInRole(RoleName);
-                        var manager = list.FirstOrDefault();    
-                        if (manager != null)
+                        if (list.Any())
                         {
-                            if (manager.Id != userid) return BadRequest(new { Message = $"There is already user has the {RoleName} role, this role should be only assigned to not more than 1 user." });
+                            var manager = list.FirstOrDefault();
+                            if (manager != null)
+                            {
+                                if (manager.Id != userid) return BadRequest(new { Message = $"There is already user has the {RoleName} role, this role should be only assigned to not more than 1 user." });
+                            }
                         }
                     }
                     var u = await _accountService.FindByEmail(model.Email);
@@ -513,6 +516,11 @@ namespace Agazaty.Controllers
                 var user = await _accountService.FindById(userid);
                 if (user != null)
                 {
+                    var roleName = await _accountService.GetFirstRole(user);
+                    if (roleName == "عميد الكلية" || roleName == "أمين الكلية" || roleName == "مدير الموارد البشرية") // ??????????
+                    {
+                        return BadRequest(new { Message = $"This user has {roleName} role. Before deleting this user, you should assign {roleName} role to new user." });
+                    }
                     var IsDeptHead = await _deptBase.Get(d => d.ManagerId == user.Id);
                     if (IsDeptHead != null)
                     {
