@@ -34,7 +34,7 @@ namespace Agazaty.Models
         [Required]
         public int NormalLeavesCount { get; set; }
         public int CasualLeavesCount { get; set; }
-        public int SickLeavesCount { get; set; }
+        public int NonChronicSickLeavesCount { get; set; }
         [ForeignKey("Department")]
         public int? Departement_ID { get; set; }
         public Department? Department { get; set; }
@@ -69,6 +69,7 @@ namespace Agazaty.Models
         public string? Street {  get; set; }
         public string? Governorate { get; set; }
         public string? State { get; set; }
+        public bool Disability { get; set; }
 
         //[DefaultValue(true)]
         //public bool IntializationCheck { get; set; }

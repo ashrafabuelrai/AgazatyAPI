@@ -419,18 +419,25 @@ namespace Agazaty.Controllers
                     }
 
                     _mapper.Map(model, user);
-                    var ageInYears = DateTime.UtcNow.Year - user.DateOfBirth.Year;
-                    if (DateTime.UtcNow.Month < user.DateOfBirth.Month ||
-                       (DateTime.UtcNow.Month == user.DateOfBirth.Month && DateTime.UtcNow.Day < user.DateOfBirth.Day))
+                    if (model.Disability == true)
                     {
-                        ageInYears--;
+                        user.LeaveSection = NormalLeaveSection.DisabilityEmployee;
                     }
-                    if (ageInYears >= 50) user.LeaveSection = NormalLeaveSection.FiftyAge;
                     else
                     {
-                        if (user.YearsOfWork == 0) user.LeaveSection = NormalLeaveSection.NoSection;
-                        if (user.YearsOfWork >= 1) user.LeaveSection = NormalLeaveSection.OneYear;
-                        if (user.YearsOfWork >= 10) user.LeaveSection = NormalLeaveSection.TenYears;
+                        var ageInYears = DateTime.UtcNow.Year - user.DateOfBirth.Year;
+                        if (DateTime.UtcNow.Month < user.DateOfBirth.Month ||
+                           (DateTime.UtcNow.Month == user.DateOfBirth.Month && DateTime.UtcNow.Day < user.DateOfBirth.Day))
+                        {
+                            ageInYears--;
+                        }
+                        if (ageInYears >= 50) user.LeaveSection = NormalLeaveSection.FiftyAge;
+                        else
+                        {
+                            if (user.YearsOfWork == 0) user.LeaveSection = NormalLeaveSection.NoSection;
+                            if (user.YearsOfWork >= 1) user.LeaveSection = NormalLeaveSection.OneYear;
+                            if (user.YearsOfWork >= 10) user.LeaveSection = NormalLeaveSection.TenYears;
+                        }
                     }
 
                     var res = await _accountService.Update(user);

@@ -4,6 +4,7 @@ using Agazaty.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Agazaty.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250325145509_adddisability")]
+    partial class adddisability
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -93,9 +95,6 @@ namespace Agazaty.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("NonChronicSickLeavesCount")
-                        .HasColumnType("int");
-
                     b.Property<int>("NormalLeavesCount")
                         .HasColumnType("int");
 
@@ -140,6 +139,9 @@ namespace Agazaty.Migrations
 
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("SickLeavesCount")
+                        .HasColumnType("int");
 
                     b.Property<string>("State")
                         .HasColumnType("nvarchar(max)");
@@ -393,12 +395,6 @@ namespace Agazaty.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
-                    b.Property<bool>("Certified")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("Chronic")
-                        .HasColumnType("bit");
-
                     b.Property<int?>("Days")
                         .HasColumnType("int");
 
@@ -406,7 +402,7 @@ namespace Agazaty.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("EndDate")
+                    b.Property<DateTime?>("EndDate")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("MedicalCommitteAddress")
@@ -415,13 +411,10 @@ namespace Agazaty.Migrations
                     b.Property<DateTime>("RequestDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<bool>("RespononseDoneForMedicalCommitte")
+                    b.Property<bool>("RespononseDone")
                         .HasColumnType("bit");
 
-                    b.Property<bool>("ResponseDoneFinal")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime>("StartDate")
+                    b.Property<DateTime?>("StartDate")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("State")

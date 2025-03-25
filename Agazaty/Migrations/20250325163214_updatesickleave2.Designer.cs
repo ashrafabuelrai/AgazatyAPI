@@ -4,6 +4,7 @@ using Agazaty.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Agazaty.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250325163214_updatesickleave2")]
+    partial class updatesickleave2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -396,7 +398,7 @@ namespace Agazaty.Migrations
                     b.Property<bool>("Certified")
                         .HasColumnType("bit");
 
-                    b.Property<bool>("Chronic")
+                    b.Property<bool?>("Chronic")
                         .HasColumnType("bit");
 
                     b.Property<int?>("Days")
@@ -406,7 +408,7 @@ namespace Agazaty.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("EndDate")
+                    b.Property<DateTime?>("EndDate")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("MedicalCommitteAddress")
@@ -421,7 +423,7 @@ namespace Agazaty.Migrations
                     b.Property<bool>("ResponseDoneFinal")
                         .HasColumnType("bit");
 
-                    b.Property<DateTime>("StartDate")
+                    b.Property<DateTime?>("StartDate")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("State")

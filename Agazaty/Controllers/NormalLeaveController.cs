@@ -40,7 +40,7 @@ namespace Agazaty.Controllers
             _leaveValidationService = leaveValidationService;
         }
         //private static Dictionary<int, List<DateTime>> officialHolidaysByYear = new Dictionary<int, List<DateTime>>();
-        //// ✅ 1. إدخال الإجازات الرسمية لسنة معينة من الـ HR
+        // ✅ 1. إدخال الإجازات الرسمية لسنة معينة من الـ HR
         //[HttpPost("add-holidays/{year}")]
         //public IActionResult AddOfficialHolidays(int year, [FromBody] List<DateTime> holidays)
         //{
@@ -52,8 +52,8 @@ namespace Agazaty.Controllers
         //    officialHolidaysByYear[year].AddRange(holidays);
         //    return Ok(new { message = $"تمت إضافة الإجازات الرسمية لسنة {year} بنجاح!", holidays });
         //}
-        //// ✅ 2. عرض الإجازات الرسمية لسنة معينة
-        ////[HttpGet("holidays/{year}")]
+        // ✅ 2. عرض الإجازات الرسمية لسنة معينة
+        //[HttpGet("holidays/{year}")]
         //public IActionResult GetOfficialHolidays(int year)
         //{
         //    if (!officialHolidaysByYear.ContainsKey(year))

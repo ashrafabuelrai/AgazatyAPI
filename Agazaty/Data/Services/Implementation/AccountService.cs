@@ -206,6 +206,7 @@ namespace Agazaty.Data.Services.Implementation
                     if (user.YearsOfWork >= 1) { user.NormalLeavesCount = 36; user.LeaveSection = NormalLeaveSection.OneYear; }
                     if (user.YearsOfWork >= 10) { user.NormalLeavesCount = 45; user.LeaveSection = NormalLeaveSection.TenYears; }
                     if (user.LeaveSection == NormalLeaveSection.FiftyAge) user.NormalLeavesCount = 60;
+                    if (user.LeaveSection == NormalLeaveSection.DisabilityEmployee) user.NormalLeavesCount = 60;
                     //var hireDuration = (DateTime.UtcNow.Date - user.HireDate).TotalDays;
                     //var age = (user.DateOfBirth - DateTime.UtcNow.Date).TotalDays;
                     //if(age >= 365*50) user.NormalLeavesCount = 60;                       // 50 years age
@@ -251,20 +252,27 @@ namespace Agazaty.Data.Services.Implementation
             {
                 user.YearsOfWork--;
             }
-            //var hireDuration = (DateTime.UtcNow.Date - user.HireDate).TotalDays;
-            // validation on leaves count from front
-            var ageInYears = DateTime.UtcNow.Year - user.DateOfBirth.Year;
-            if (DateTime.UtcNow.Month < user.DateOfBirth.Month ||
-               (DateTime.UtcNow.Month == user.DateOfBirth.Month && DateTime.UtcNow.Day < user.DateOfBirth.Day))
+            if (model.Disability == true)
             {
-                ageInYears--;
+                user.LeaveSection = NormalLeaveSection.DisabilityEmployee;
             }
-            if (ageInYears >= 50) user.LeaveSection = NormalLeaveSection.FiftyAge;
             else
-            {
-                if (user.YearsOfWork == 0) user.LeaveSection = NormalLeaveSection.NoSection;
-                if (user.YearsOfWork >= 1) user.LeaveSection = NormalLeaveSection.OneYear;
-                if (user.YearsOfWork >= 10) user.LeaveSection = NormalLeaveSection.TenYears;
+            {   
+                //var hireDuration = (DateTime.UtcNow.Date - user.HireDate).TotalDays;
+                // validation on leaves count from front
+                var ageInYears = DateTime.UtcNow.Year - user.DateOfBirth.Year;
+                if (DateTime.UtcNow.Month < user.DateOfBirth.Month ||
+                   (DateTime.UtcNow.Month == user.DateOfBirth.Month && DateTime.UtcNow.Day < user.DateOfBirth.Day))
+                {
+                    ageInYears--;
+                }
+                if (ageInYears >= 50) user.LeaveSection = NormalLeaveSection.FiftyAge;
+                else
+                {
+                    if (user.YearsOfWork == 0) user.LeaveSection = NormalLeaveSection.NoSection;
+                    if (user.YearsOfWork >= 1) user.LeaveSection = NormalLeaveSection.OneYear;
+                    if (user.YearsOfWork >= 10) user.LeaveSection = NormalLeaveSection.TenYears;
+                }
             }
 
             var result = await _userManager.CreateAsync(user, model.Password);
@@ -322,7 +330,7 @@ namespace Agazaty.Data.Services.Implementation
                 FullName = $"{user.ForthName} {user.ThirdName} {user.SecondName} {user.FirstName}",
                 NormalLeavesCount = user.NormalLeavesCount,
                 CasualLeavesCount = user.CasualLeavesCount,
-                SickLeavesCount = user.SickLeavesCount,
+                SickLeavesCount = user.NonChronicSickLeavesCount,
                 Email = user.Email,
                 Id = user.Id,
             };

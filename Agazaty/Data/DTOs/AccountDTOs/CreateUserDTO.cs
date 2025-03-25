@@ -58,5 +58,7 @@ namespace Agazaty.Data.DTOs.AccountDTOs
         public string? Street { get; set; }
         public string? governorate { get; set; }
         public string? State { get; set; }
+        public bool Disability { get; set; }
+
     }
 }

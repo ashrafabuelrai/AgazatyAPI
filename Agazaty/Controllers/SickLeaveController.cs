@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Mvc;
 using Org.BouncyCastle.Asn1.Ocsp;
 using System.Data;
 using System.Net;
+using static Agazaty.Data.Enums.LeaveTypes;
 
 namespace Agazaty.Controllers
 {
@@ -139,12 +140,38 @@ namespace Agazaty.Controllers
             }
         }
         //[Authorize(Roles = "مدير الموارد البشرية")]
-        [HttpGet("GetAllAcceptedSickLeaves")]
-        public async Task<IActionResult> GetAllAcceptedSickLeaves()
+        //[HttpGet("GetAllAcceptedSickLeaves")]
+        //public async Task<IActionResult> GetAllAcceptedSickLeaves()
+        //{
+        //    try
+        //    {
+        //        var waitingSickLeaves = await _base.GetAll(s => s.Re == true);
+
+        //        if (waitingSickLeaves.Any())
+        //        {
+        //            var leaves = _mapper.Map<IEnumerable<SickLeaveDTO>>(waitingSickLeaves);
+        //            foreach (var leave in leaves)
+        //            {
+        //                var user = await _accoutnService.FindById(leave.UserID);
+        //                leave.UserName = $"{user.FirstName} {user.SecondName} {user.ThirdName} {user.ForthName}";
+        //            }
+        //            return Ok(leaves);
+        //        }
+
+        //        return NotFound("No accepted sick leaves found.");
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return StatusCode(500, new { message = "An error occurred while processing your request.", error = ex.Message });
+        //    }
+        //}
+        //[Authorize(Roles = "مدير الموارد البشرية")]
+        [HttpGet("GetAllWaitingCertifiedSickLeaves")]
+        public async Task<IActionResult> GetAllCertifiedWaitingSickLeaves()
         {
             try
             {
-                var waitingSickLeaves = await _base.GetAll(s => s.RespononseDone == true);
+                var waitingSickLeaves = await _base.GetAll(s => s.RespononseDoneForMedicalCommitte == true &&s.ResponseDoneFinal==false);
 
                 if (waitingSickLeaves.Any())
                 {
@@ -157,7 +184,7 @@ namespace Agazaty.Controllers
                     return Ok(leaves);
                 }
 
-                return NotFound("No accepted sick leaves found.");
+                return NotFound("No waiting sick leaves found.");
             }
             catch (Exception ex)
             {
@@ -170,7 +197,7 @@ namespace Agazaty.Controllers
         {
             try
             {
-                var waitingSickLeaves = await _base.GetAll(s => s.RespononseDone == false);
+                var waitingSickLeaves = await _base.GetAll(s => s.RespononseDoneForMedicalCommitte == false);
 
                 if (waitingSickLeaves.Any())
                 {
@@ -206,7 +233,7 @@ namespace Agazaty.Controllers
                 }
                 // Check if the user already has a pending leave request
                 bool hasPendingLeave = _appDbContext.SickLeaves
-                .Any(l => l.UserID == model.UserID && l.RespononseDone == false);
+                .Any(l => l.UserID == model.UserID && l.RespononseDoneForMedicalCommitte == false);
                 if (hasPendingLeave)
                 {
                     return BadRequest(new { message = "You already have a pending leave request that has not been processed yet." });
@@ -252,7 +279,7 @@ namespace Agazaty.Controllers
 
                 // Update fields
                 sickLeave.MedicalCommitteAddress = address;
-                sickLeave.RespononseDone = true;
+                sickLeave.RespononseDoneForMedicalCommitte= true;
 
                 var leave = _mapper.Map<SickLeaveDTO>(sickLeave);
                 var user = await _accoutnService.FindById(leave.UserID);
@@ -266,13 +293,13 @@ namespace Agazaty.Controllers
                 return StatusCode(500, new { message = "An error occurred while processing your request.", error = ex.Message });
             }
         }
-        //[Authorize]
-        [HttpPut("UpdateSickLeaveDays/{leaveID}")]
-        public async Task<IActionResult> UpdateSickLeaveDate(int leaveID, [FromBody]UpdateSickLeaveDTO model)
+        //Authorize(Roles = "مدير الموارد البشرية")]
+        [HttpPut("UpdateSickLeave/{leaveID}")]
+        public async Task<IActionResult> UpdateSickLeave(int leaveID, [FromBody]UpdateSickLeaveDTO model)
         {
             if (leaveID <= 0)
             {
-                return BadRequest("Invalid leave ID or address.");
+                return BadRequest("Invalid leave ID.");
             }
             try
             {
@@ -284,49 +311,62 @@ namespace Agazaty.Controllers
                 {
                     return BadRequest(ModelState);
                 }
-                //var userleave =await _base.Get(l=>l.Id==leaveID);
-     
-                var sickleave = await _base.Get(s => s.Id == leaveID&&s.RespononseDone==true);
-                var userid = sickleave.UserID;
-                if (await _leaveValidationService.IsSameLeaveOverlapping(userid, model.StartDate, model.EndDate, "SickLeave"))
+                var sickleave = await _base.Get(s => s.Id == leaveID && s.RespononseDoneForMedicalCommitte == true && s.ResponseDoneFinal == false);
+                if (model.Certified == false)
                 {
-                    return BadRequest("You already have a Sick leave in this period.");
+                    sickleave.ResponseDoneFinal = true;
+                    await _base.Update(sickleave);
+                    return Ok(new { Message = "Update is succeeded.", Leave = sickleave });
                 }
-                if (await _leaveValidationService.IsLeaveOverlapping(userid, model.StartDate, model.EndDate, "SickLeave"))
+                else
                 {
-                    return BadRequest("You already have a different type of leave in this period.");
+                    sickleave.ResponseDoneFinal = true;
+                    //var userleave =await _base.Get(l=>l.Id==leaveID);
+                    var userid = sickleave.UserID;
+                    if (await _leaveValidationService.IsSameLeaveOverlapping(userid, model.StartDate, model.EndDate, "SickLeave"))
+                    {
+                        return BadRequest("You already have a Sick leave in this period.");
+                    }
+                    if (await _leaveValidationService.IsLeaveOverlapping(userid, model.StartDate, model.EndDate, "SickLeave"))
+                    {
+                        return BadRequest("You already have a different type of leave in this period.");
+                    }
+                    if (sickleave == null)
+                    {
+                        return NotFound("SickLeave not found.");
+                    }
+                    var errors = new List<string>();
+                    DateTime today = DateTime.Today;
+                    if (model.EndDate < today)
+                        errors.Add("The leave period has already passed. Please select future dates.");
+
+                    if (model.StartDate < today)
+                        errors.Add("The start date cannot be in the past. Please select today or a future date.");
+
+                    if (model.StartDate > model.EndDate)
+                        errors.Add("Start date cannot be after the end date.");
+
+                    if (DateTime.UtcNow.Date > model.StartDate)
+                        errors.Add("Request date cannot be after the start date.");
+
+                    if (errors.Any())
+                        return BadRequest(new { messages = errors });
+
+                    _mapper.Map(model, sickleave);
+                    sickleave.Days = ((model.EndDate - model.StartDate).Days) + 1;
+                    await _base.Update(sickleave);
+
+                    var leave = _mapper.Map<SickLeaveDTO>(sickleave);
+                    var user = await _accoutnService.FindById(leave.UserID);
+                    if (!model.Chronic)
+                    {
+                        user.NonChronicSickLeavesCount += (int)sickleave.Days;
+                    }
+                    await _accoutnService.Update(user);
+                    leave.UserName = $"{user.FirstName} {user.SecondName} {user.ThirdName} {user.ForthName}";
+                    return Ok(new { Message = "Update is succeeded.", Leave = leave });
                 }
-                if (sickleave == null)
-                {
-                    return NotFound("SickLeave not found.");
-                }
-                var errors = new List<string>();
-                DateTime today = DateTime.Today;
-                if (model.EndDate < today)
-                    errors.Add("The leave period has already passed. Please select future dates.");
-
-                if (model.StartDate < today)
-                    errors.Add("The start date cannot be in the past. Please select today or a future date.");
-
-                if (model.StartDate > model.EndDate)
-                    errors.Add("Start date cannot be after the end date.");
-
-                if (DateTime.UtcNow.Date > model.StartDate)
-                    errors.Add("Request date cannot be after the start date.");
-
-                if (errors.Any())
-                    return BadRequest(new { messages = errors });
-
-                _mapper.Map(model, sickleave);
-                sickleave.Days = ((model.EndDate - model.StartDate).Days) + 1;
-                await _base.Update(sickleave);
-
-                var leave = _mapper.Map<SickLeaveDTO>(sickleave);
-                var user = await _accoutnService.FindById(leave.UserID);
-                user.SickLeavesCount +=(int)sickleave.Days;
-                await _accoutnService.Update(user);
-                leave.UserName = $"{user.FirstName} {user.SecondName} {user.ThirdName} {user.ForthName}";
-                return Ok(new { Message = "Update is succeeded.", Leave = leave });
+            
             }
             catch (Exception ex)
             {
