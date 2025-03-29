@@ -21,7 +21,7 @@ namespace Agazaty.Data.Services
             _dbConnection = dbConnection;
         }
 
-        public async Task<bool> IsLeaveOverlapping(string userId, DateTime? startDate, DateTime? endDate, string leaveType)
+        public async Task<bool> IsLeaveOverlapping(string userId, DateTime startDate, DateTime endDate, string leaveType)
         {
             //((l.StartDate <= endDate && l.EndDate >= startDate) ||
             //(l.EndDate >= startDate && l.StartDate <= startDate))))
@@ -53,7 +53,7 @@ namespace Agazaty.Data.Services
 
             return result.HasValue; // Returns true if an overlapping leave exists
         }
-        public async Task<bool> IsSameLeaveOverlapping(string userId, DateTime? startDate, DateTime? endDate, string leaveType)
+        public async Task<bool> IsSameLeaveOverlapping(string userId, DateTime startDate, DateTime endDate, string leaveType)
         {
             if(leaveType == "SickLeave")
             {

@@ -97,11 +97,17 @@ namespace Agazaty.Controllers
                 {
                     return NotFound(new { Message = "Manager is not found" });
                 }
-                var IsAlreadyManager = await _base.Get(d => d.ManagerId == model.ManagerId);
-                if (IsAlreadyManager != null)
+                // to check : is user whose id is equal model.managerid exists in another department ?
+                var IsExistsInAnotherDepartment = await _base.Get(d => d.Id == res.Departement_ID);
+                if (IsExistsInAnotherDepartment != null) // this means that user exists in another department
                 {
-                    return BadRequest(new { Message = "This Manager already in a head of a department." });
+                    return BadRequest(new { Message = $"The user exists in {IsExistsInAnotherDepartment.Name} department, make this user with no department so you can make him the manager of the department which you create now." });
                 }
+                //var IsAlreadyManager = await _base.Get(d => d.ManagerId == model.ManagerId);
+                //if (IsAlreadyManager != null)
+                //{
+                //    return BadRequest(new { Message = "This Manager already in a head of a department." });
+                //}
                 var department = _mapper.Map<Department>(model);
                 await _base.Add(department);
                 var manager = await _accountService.FindById(department.ManagerId);
@@ -143,12 +149,21 @@ namespace Agazaty.Controllers
                 {
                     return NotFound(new { Message = "Department is not found." });
                 }
-                var IsAlreadyManager = await _base.Get(d => d.ManagerId == model.ManagerId);
-                if(IsAlreadyManager != null)
+                //var IsAlreadyManager = await _base.Get(d => d.ManagerId == model.ManagerId);
+                //if(IsAlreadyManager != null)
+                //{
+                //    if (department.Id != IsAlreadyManager.Id)
+                //    {
+                //        return BadRequest(new { Message = "This Manager already in a head of a another department." });
+                //    }
+                //}
+                // to check is user exists in another department
+                var IsExistsInAnotherDepartment = await _base.Get(d => d.Id == res.Departement_ID);
+                if (IsExistsInAnotherDepartment != null)
                 {
-                    if (department.Id != IsAlreadyManager.Id)
+                    if (IsExistsInAnotherDepartment.Id != department.Id)
                     {
-                        return BadRequest(new { Message = "This Manager already in a head of a another department." });
+                        return BadRequest(new { Message = $"The user exists in {IsExistsInAnotherDepartment.Name} department. Add user as a member to {department.Name} deaprtment or meke him with no department, so you can assign him as a head of {department.Name} department." });
                     }
                 }
                 _mapper.Map(model, department);
