@@ -17,6 +17,7 @@ using Microsoft.IdentityModel.Tokens;
 using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Principal;
 using System.Text;
 
 namespace Agazaty.Data.Services.Implementation
@@ -360,12 +361,12 @@ namespace Agazaty.Data.Services.Implementation
         {
             return await _userManager.DeleteAsync(user);
         }
-        public async Task<AuthModel> ForgetPassword(SendOTPDTO DTO)
+        public async Task<ForgetPassResponse> ForgetPassword(SendOTPDTO DTO)
         {
             var Account = await FindByEmail(DTO.Email);
             if (Account == null)
             {
-                return new AuthModel { Message = "user not found" };
+                return new ForgetPassResponse { Message = "user not found" };
             }
             //if (Account.UserName != DTO.UserName)
             //{
@@ -373,12 +374,12 @@ namespace Agazaty.Data.Services.Implementation
             //}
             return await SendOTP(DTO.Email);
         }
-        public async Task<AuthModel> ResetPassword(ResetPasswordDTO DTO)
+        public async Task<ForgetPassResponse> ResetPassword(ResetPasswordDTO DTO)
         {
             var Account = await FindByEmail(DTO.email);
             if (Account == null)
             {
-                return new AuthModel { Message = "user not found" };
+                return new ForgetPassResponse { Message = "user not found" };
             }
             //if (/*DTO.token == null || DTO.token != Account.OTP ||*/ DateTime.UtcNow > Account.OTPExpiry)
             //{
@@ -396,9 +397,9 @@ namespace Agazaty.Data.Services.Implementation
                 {
                     errors += $"{error.Description} , ";
                 }
-                return new AuthModel { Message = errors };
+                return new ForgetPassResponse { Message = errors };
             }
-            return new AuthModel { Message = "Password Changed successfully" };
+            return new ForgetPassResponse { Email = Account.Email, Message = "Password Changed successfully",IsAuthenticated=true };
             //var result=await _UserManager.ResetPasswordAsync(user, token, NewPassword);
         }
         private string GenerateOTP()
@@ -407,16 +408,16 @@ namespace Agazaty.Data.Services.Implementation
             string randomNumber = random.Next(0, 1000000).ToString("D6");
             return randomNumber;
         }
-        public async Task<AuthModel> SendOTP(string email)
+        public async Task<ForgetPassResponse> SendOTP(string email)
         {
             var account = await FindByEmail(email);
             if (account == null)
             {
-                return new AuthModel { Message = "account not found." };
+                return new ForgetPassResponse {  Message = "account not found." };
             }
             if (account.OTP != null && account.OTPExpiry > DateTime.UtcNow)
             {
-                return new AuthModel { Message = "there is already otp sent" };
+                return new ForgetPassResponse { Email = account.Email, Message = "there is already otp sent" };
             }
             string OTP = GenerateOTP();
             account.OTP = OTP;
@@ -429,18 +430,19 @@ namespace Agazaty.Data.Services.Implementation
                 Body = $"Your OTP is {OTP}"
             };
             await _EmailService.SendEmail(emailrequest);
-            return new AuthModel { Email = account.Email, Message = "OTP has been sent to your email" };
+
+            return new ForgetPassResponse { Email = account.Email, IsAuthenticated=true, Message = "OTP has been sent to your email" };
         }
-        public async Task<AuthModel> VerifyOtpAsync(string Email, string enteredOtp)
+        public async Task<ForgetPassResponse> VerifyOtpAsync(string Email, string enteredOtp)
         {
             ApplicationUser? Account = await _userManager.FindByEmailAsync(Email);
             if (Account == null)
             {
-                return new AuthModel { Message = "User not found" };
+                return new ForgetPassResponse { Message = "User not found" };
             }
             if (enteredOtp == null || enteredOtp != Account.OTP || DateTime.UtcNow > Account.OTPExpiry)
             {
-                return new AuthModel { Message = "Invalid OTP" };
+                return new ForgetPassResponse { Email = Account.Email, Message = "Invalid OTP" };
             }
 
             Account.OTP = null;
@@ -448,9 +450,9 @@ namespace Agazaty.Data.Services.Implementation
             await _userManager.UpdateAsync(Account);
 
             var JwtSecurityToken = await CreateJwtToken(Account);
-            new AuthModel { Message = "Invalid OTP" };
+            //new AuthModel { Message = "Invalid OTP" };
 
-            return new AuthModel
+            return new ForgetPassResponse
             {
                 //Id = Account.Id,
                 //Email = Account.Email,
@@ -458,7 +460,8 @@ namespace Agazaty.Data.Services.Implementation
                 IsAuthenticated = true,
                 ////Roles = await _userManager.GetRolesAsync(Account),
                 //Token = new JwtSecurityTokenHandler().WriteToken(JwtSecurityToken),
-                Message = "Changed"
+                Message = "right OTP",
+                Email = Account.Email
             };
         }
     }

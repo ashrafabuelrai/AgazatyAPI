@@ -41,6 +41,7 @@ namespace Agazaty.Controllers
         public async Task<IActionResult> ResetPassword(ResetPasswordDTO DTO)
         {
             var result = await _accountService.ResetPassword(DTO);
+            if (!result.IsAuthenticated) return BadRequest(result);
             return Ok(result);
         }
         //[Authorize]
@@ -48,6 +49,7 @@ namespace Agazaty.Controllers
         public async Task<IActionResult> ForgetPassword(SendOTPDTO DTO)
         {
             var result = await _accountService.ForgetPassword(DTO);
+            if (!result.IsAuthenticated) return BadRequest(result);
             return Ok(result);
         }
         //[Authorize]
@@ -55,6 +57,7 @@ namespace Agazaty.Controllers
         public async Task<IActionResult> SendOtp(SendOTPDTO DTO)
         {
             var result = await _accountService.SendOTP(DTO.Email);
+            if (!result.IsAuthenticated) return BadRequest(result);
             return Ok(result);
         }
         [HttpPost("Verify-OTP")]
@@ -100,6 +103,7 @@ namespace Agazaty.Controllers
 
                 var ReturnedUser = _mapper.Map<UserDTO>(user);
                 ReturnedUser.FullName = $"{user.FirstName} {user.SecondName} {user.ThirdName} {user.ForthName}";
+                ReturnedUser.RoleName = await _accountService.GetFirstRole(user);
                 if (user.Departement_ID != null)
                 {
                     var dept = await _deptBase.Get(d => d.Id == user.Departement_ID);
@@ -146,6 +150,7 @@ namespace Agazaty.Controllers
 
                 var ReturnedUser = _mapper.Map<UserDTO>(user);
                 ReturnedUser.FullName = $"{user.FirstName} {user.SecondName} {user.ThirdName} {user.ForthName}";
+                ReturnedUser.RoleName = await _accountService.GetFirstRole(user);
                 if (user.Departement_ID != null)
                 {
                     var dpt = await _deptBase.Get(d => d.Id == user.Departement_ID);
@@ -172,6 +177,7 @@ namespace Agazaty.Controllers
                 {
                     var user = await _accountService.FindById(ReturnedUser.Id);
                     ReturnedUser.FullName = $"{user.FirstName} {user.SecondName} {user.ThirdName} {user.ForthName}";
+                    ReturnedUser.RoleName = await _accountService.GetFirstRole(user);
                     if (user.Departement_ID != null)
                     {
                         var dpt = await _deptBase.Get(d => d.Id == user.Departement_ID);
@@ -199,6 +205,7 @@ namespace Agazaty.Controllers
                 {
                     var user = await _accountService.FindById(ReturnedUser.Id);
                     ReturnedUser.FullName = $"{user.FirstName} {user.SecondName} {user.ThirdName} {user.ForthName}";
+                    ReturnedUser.RoleName = await _accountService.GetFirstRole(user);
                     if (user.Departement_ID != null)
                     {
                         var dpt = await _deptBase.Get(d => d.Id == user.Departement_ID);
@@ -229,6 +236,7 @@ namespace Agazaty.Controllers
                 {
                     var user = await _accountService.FindById(ReturnedUser.Id);
                     ReturnedUser.FullName = $"{user.FirstName} {user.SecondName} {user.ThirdName} {user.ForthName}";
+                    ReturnedUser.RoleName = await _accountService.GetFirstRole(user);
                     if (user.Departement_ID != null)
                     {
                         var dpt = await _deptBase.Get(d => d.Id == user.Departement_ID);
@@ -261,6 +269,7 @@ namespace Agazaty.Controllers
                 {
                     var user = await _accountService.FindById(ReturnedUser.Id);
                     ReturnedUser.FullName = $"{user.FirstName} {user.SecondName} {user.ThirdName} {user.ForthName}";
+                    ReturnedUser.RoleName = await _accountService.GetFirstRole(user);
                     if (user.Departement_ID != null)
                     {
                         var dpt = await _deptBase.Get(d => d.Id == user.Departement_ID);
@@ -452,6 +461,7 @@ namespace Agazaty.Controllers
 
                         var ReturnedUser = _mapper.Map<UserDTO>(user);
                         ReturnedUser.FullName = $"{user.FirstName} {user.SecondName} {user.ThirdName} {user.ForthName}";
+                        ReturnedUser.RoleName = await _accountService.GetFirstRole(user);
                         if (user.Departement_ID != null)
                         {
                             var dpt = await _deptBase.Get(d => d.Id == user.Departement_ID);

@@ -12,6 +12,7 @@ namespace Agazaty.Data.DTOs.AccountDTOs
         public string? ThirdName { get; set; }
         public string? ForthName { get; set; }
         public string? FullName { get; set; }
+        public string? RoleName { get; set; }
         public string? DepartmentName { get; set; }
         public int NonChronicSickLeavesCount { get; set; }
         public int NormalLeavesCount { get; set; }

@@ -38,24 +38,24 @@ namespace Agazaty.Controllers
         public async Task<IActionResult> GetSickLeaveById(int leaveID)
         {
             if (leaveID <= 0)
-                return BadRequest(new { message = "Invalid leave ID." });
+                return BadRequest(new { message = ".معرّف إجازة مرضي غير صالح" });
             try
             {
 
-                var sikLeave = await _base.Get(s => s.Id == leaveID);
-                if (sikLeave == null)
+                var sickLeave = await _base.Get(s => s.Id == leaveID);
+                if (sickLeave == null)
                 {
-                    return NotFound(new { message = $"No sick leave found for this leave ID {leaveID}." });
+                    return NotFound(new { message = $".لم يتم العثور على إجازة مرضي لهذا المعرف {leaveID}." });
                 }
 
-                var leave = _mapper.Map<SickLeaveDTO>(sikLeave);
+                var leave = _mapper.Map<SickLeaveDTO>(sickLeave);
                 var user = await _accoutnService.FindById(leave.UserID);
                 leave.UserName = $"{user.FirstName} {user.SecondName} {user.ThirdName} {user.ForthName}";
                 return Ok(leave);
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "An error occurred while processing your request.", error = ex.Message });
+                return StatusCode(500, new { message = ".حدث خطأ أثناء معالجة طلبك", error = ex.Message });
             }
         }
         //[Authorize]
@@ -63,14 +63,14 @@ namespace Agazaty.Controllers
         public async Task<IActionResult> GetAllSickLeavesByUserID(string userID)
         {
             if (string.IsNullOrWhiteSpace(userID))
-                return BadRequest(new { message = "Invalid user ID." });
+                return BadRequest(new { message = ".معرّف المستخدم غير صالح" });
             try
             {
 
                 var sickleaves = await _base.GetAll(s => s.UserID == userID);
                 if (!sickleaves.Any())
                 {
-                    return NotFound(new { message = $"No sick leaves found for this User ID {userID}." });
+                    return NotFound(new { message = $".لم يتم العثور على إجازات مرضية لهذا معرف المستخدم {userID}" });
                 }
 
                 var leaves = _mapper.Map<IEnumerable<SickLeaveDTO>>(sickleaves);
@@ -83,7 +83,7 @@ namespace Agazaty.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "An error occurred while processing your request.", error = ex.Message });
+                return StatusCode(500, new { message = ".حدث خطأ أثناء معالجة طلبك", error = ex.Message });
             }
         }
         //[Authorize(Roles = "عميد الكلية,أمين الكلية,مدير الموارد البشرية")]
@@ -93,7 +93,7 @@ namespace Agazaty.Controllers
             try
             {
                 var sickLeaves = await _base.GetAll();
-                if (!sickLeaves.Any()) return NotFound(new {Message = "no sick leaves found."});
+                if (!sickLeaves.Any()) return NotFound(new {Message = ".لم يتم العثور على إجازات مرضية" });
 
                 var leaves = _mapper.Map<IEnumerable<SickLeaveDTO>>(sickLeaves);
                 foreach (var leave in leaves)
@@ -105,7 +105,7 @@ namespace Agazaty.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "An error occurred while processing your request.", error = ex.Message });
+                return StatusCode(500, new { message = ".حدث خطأ أثناء معالجة طلبك", error = ex.Message });
             }
         }
         //[Authorize]
@@ -114,7 +114,7 @@ namespace Agazaty.Controllers
         {
             if (string.IsNullOrWhiteSpace(userID) || year < 1900)
             {
-                return BadRequest("Invalid user ID or year.");
+                return BadRequest(".معرّف المستخدم أو السنة غير صالحين");
             }
 
             try
@@ -132,11 +132,11 @@ namespace Agazaty.Controllers
                     return Ok(leaves);
                 }
 
-                return NotFound("No sick leaves found for the given user ID and year.");
+                return NotFound(".لم يتم العثور على إجازات مرضية لهذا معرف المستخدم والسنة المحددة");
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "An error occurred while processing your request.", error = ex.Message });
+                return StatusCode(500, new { message = ".حدث خطأ أثناء معالجة طلبك", error = ex.Message });
             }
         }
         //[Authorize(Roles = "مدير الموارد البشرية")]
@@ -184,11 +184,11 @@ namespace Agazaty.Controllers
                     return Ok(leaves);
                 }
 
-                return NotFound("No waiting sick leaves found.");
+                return NotFound(".لم يتم العثور على إجازات مرضية في الانتظار");
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "An error occurred while processing your request.", error = ex.Message });
+                return StatusCode(500, new { message = ".حدث خطأ أثناء معالجة طلبك", error = ex.Message });
             }
         }
         //[Authorize(Roles = "مدير الموارد البشرية")]
@@ -210,11 +210,11 @@ namespace Agazaty.Controllers
                     return Ok(leaves);
                 }
 
-                return NotFound("No waiting sick leaves found.");
+                return NotFound(".لم يتم العثور على إجازات مرضية في الانتظار");
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "An error occurred while processing your request.", error = ex.Message });
+                return StatusCode(500, new { message = ".حدث خطأ أثناء معالجة طلبك", error = ex.Message });
             }
         }
         //[Authorize]
@@ -225,7 +225,7 @@ namespace Agazaty.Controllers
             {
                 if (model == null)
                 {
-                    return NotFound("Invalid sick leave data.");
+                    return NotFound(".بيانات الإجازة المرضية غير صالحة");
                 }
                 if (!ModelState.IsValid)
                 {
@@ -236,7 +236,7 @@ namespace Agazaty.Controllers
                 .Any(l => l.UserID == model.UserID && l.RespononseDoneForMedicalCommitte == false);
                 if (hasPendingLeave)
                 {
-                    return BadRequest(new { message = "You already have a pending leave request that has not been processed yet." });
+                    return BadRequest(new { message = ".لديك طلب إجازة قيد الانتظار ولم يتم الرد عليه بعد" });
                 }
                 SickLeave sickLeave = _mapper.Map<SickLeave>(model);
                 sickLeave.RequestDate = DateTime.UtcNow.Date;
@@ -251,7 +251,7 @@ namespace Agazaty.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "An error occurred while processing your request.", error = ex.Message });
+                return StatusCode(500, new { message = ".حدث خطأ أثناء معالجة طلبك", error = ex.Message });
             }
         }
         //[Authorize(Roles = "مدير الموارد البشرية")]
@@ -260,7 +260,7 @@ namespace Agazaty.Controllers
         {
             if (leaveID <= 0 || string.IsNullOrWhiteSpace(address))
             {
-                return BadRequest("Invalid leave ID or address.");
+                return BadRequest(".معرّف الإجازة أو العنوان غير صالح");
             }
 
             try
@@ -274,7 +274,7 @@ namespace Agazaty.Controllers
 
                 if (sickLeave == null)
                 {
-                    return NotFound("Sick leave request not found.");
+                    return NotFound(".لم يتم العثور على طلب إجازة مرضية");
                 }
 
                 // Update fields
@@ -286,11 +286,11 @@ namespace Agazaty.Controllers
                 leave.UserName = $"{user.FirstName} {user.SecondName} {user.ThirdName} {user.ForthName}";
                 await _base.Update(sickLeave);
 
-                return Ok(new { Message = "Medical committee address updated and response marked as done.", Leave = leave });
+                return Ok(new { Message = ".تم تحديث عنوان القومسيون الطبي وتم الرد", Leave = leave });
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "An error occurred while processing your request.", error = ex.Message });
+                return StatusCode(500, new { message = ".حدث خطأ أثناء معالجة طلبك", error = ex.Message });
             }
         }
         //Authorize(Roles = "مدير الموارد البشرية")]
@@ -299,13 +299,13 @@ namespace Agazaty.Controllers
         {
             if (leaveID <= 0)
             {
-                return BadRequest("Invalid leave ID.");
+                return BadRequest(".معرّف الإجازة غير صالح");
             }
             try
             {
                 if (model == null)
                 {
-                    return BadRequest("Invalid sick leave data.");
+                    return BadRequest(".بيانات الإجازة المرضية غير صالحة");
                 }
                 if (!ModelState.IsValid)
                 {
@@ -316,7 +316,7 @@ namespace Agazaty.Controllers
                 {
                     sickleave.ResponseDoneFinal = true;
                     await _base.Update(sickleave);
-                    return Ok(new { Message = "Update is succeeded.", Leave = sickleave });
+                    return Ok(new { Message = ".تم التحديث بنجاح", Leave = sickleave });
                 }
                 else
                 {
@@ -325,29 +325,29 @@ namespace Agazaty.Controllers
                     var userid = sickleave.UserID;
                     if (await _leaveValidationService.IsSameLeaveOverlapping(userid, model.StartDate, model.EndDate, "SickLeave"))
                     {
-                        return BadRequest("You already have a Sick leave in this period.");
+                        return BadRequest(".لديك إجازة مرضية في هذه الفترة بالفعل");
                     }
                     if (await _leaveValidationService.IsLeaveOverlapping(userid, model.StartDate, model.EndDate, "SickLeave"))
                     {
-                        return BadRequest("You already have a different type of leave in this period.");
+                        return BadRequest(".لديك نوع آخر من الإجازات في هذه الفترة بالفعل");
                     }
                     if (sickleave == null)
                     {
-                        return NotFound("SickLeave not found.");
+                        return NotFound(".لم يتم العثور على إجازة مرضية");
                     }
                     var errors = new List<string>();
                     DateTime today = DateTime.Today;
                     if (model.EndDate < today)
-                        errors.Add("The leave period has already passed. Please select future dates.");
+                        errors.Add(".فترة الإجازة قد انتهت بالفعل. يرجى اختيار تواريخ مستقبلية");
 
                     if (model.StartDate < today)
-                        errors.Add("The start date cannot be in the past. Please select today or a future date.");
+                        errors.Add(".لا يمكن أن يكون تاريخ البداية في الماضي. يرجى اختيار اليوم أو تاريخ مستقبلي");
 
                     if (model.StartDate > model.EndDate)
-                        errors.Add("Start date cannot be after the end date.");
+                        errors.Add(".لا يمكن أن يكون تاريخ البداية بعد تاريخ النهاية");
 
                     if (DateTime.UtcNow.Date > model.StartDate)
-                        errors.Add("Request date cannot be after the start date.");
+                        errors.Add(".لا يمكن أن يكون تاريخ الطلب بعد تاريخ البداية");
 
                     if (errors.Any())
                         return BadRequest(new { messages = errors });
@@ -364,13 +364,13 @@ namespace Agazaty.Controllers
                     }
                     await _accoutnService.Update(user);
                     leave.UserName = $"{user.FirstName} {user.SecondName} {user.ThirdName} {user.ForthName}";
-                    return Ok(new { Message = "Update is succeeded.", Leave = leave });
+                    return Ok(new { Message = ".تم التحديث بنجاح", Leave = leave });
                 }
             
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "An error occurred while processing your request.", error = ex.Message });
+                return StatusCode(500, new { message = ".حدث خطأ أثناء معالجة طلبك", error = ex.Message });
             }
         }
         //[Authorize(Roles = "مدير الموارد البشرية")]
@@ -378,22 +378,22 @@ namespace Agazaty.Controllers
         public async Task<IActionResult> DeleteSickLeave(int leaveID)
         {
             if (leaveID <= 0)
-                return BadRequest(new { message = "Invalid leave ID." });
+                return BadRequest(new { message = ".معرّف الإجازة غير صالح" });
             try
             {
                 var sickleave = await _base.Get(s => s.Id == leaveID);
 
                 if (sickleave == null)
                 {
-                    return NotFound("Sick leave not found.");
+                    return NotFound(".لم يتم العثور على إجازة مرضية");
                 }
 
                 await _base.Remove(sickleave);
-                return Ok($"Sick leave has been deleted successfully.");
+                return Ok(".تم حذف الإجازة المرضية بنجاح");
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "An error occurred while processing your request.", error = ex.Message });
+                return StatusCode(500, new { message = ".حدث خطأ أثناء معالجة طلبك", error = ex.Message });
             }
         }
     }
