@@ -10,11 +10,11 @@ namespace Agazaty.Data.DTOs.AccountDTOs
         public string CurrentPassword { get; set; }
 
         [Required]
-        [StringLength(100, MinimumLength = 8, ErrorMessage = "Password must be at least 8 characters long.")]
+        [StringLength(100, MinimumLength = 8, ErrorMessage = ".يجب أن تكون كلمة المرور على الأقل 8 أحرف")]
         public string NewPassword { get; set; }
 
         [Required]
-        [Compare("NewPassword", ErrorMessage = "Passwords do not match.")]
+        [Compare("NewPassword", ErrorMessage = ".كلمة المرور غير متطابقة")]
         public string ConfirmNewPassword { get; set; }
     }
 }

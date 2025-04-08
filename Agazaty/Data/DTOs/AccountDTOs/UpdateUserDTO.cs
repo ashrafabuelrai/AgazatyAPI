@@ -6,21 +6,21 @@ namespace Agazaty.Data.DTOs.AccountDTOs
     public class UpdateUserDTO
     {
         [Required]
-        [RegularExpression(@"^[\p{L}]+$", ErrorMessage = "The field must contain only letters (English or Arabic), with no numbers or spaces.")]
+        [RegularExpression(@"^[\p{L}]+$", ErrorMessage = ".يجب أن يحتوي حقل الاسم الأول على حروف فقط (بالعربية)، دون أرقام أو مسافات")]
         public string FirstName { get; set; }
         [Required]
-        [RegularExpression(@"^[\p{L}]+$", ErrorMessage = "The field must contain only letters (English or Arabic), with no numbers or spaces.")]
+        [RegularExpression(@"^[\p{L}]+$", ErrorMessage = ".يجب أن يحتوي حقل الاسم الثاني على حروف فقط (بالعربية)، دون أرقام أو مسافات")]
         public string SecondName { get; set; }
         [Required]
-        [RegularExpression(@"^[\p{L}]+$", ErrorMessage = "The field must contain only letters (English or Arabic), with no numbers or spaces.")]
+        [RegularExpression(@"^[\p{L}]+$", ErrorMessage = ".يجب أن يحتوي حقل الاسم الثالث على حروف فقط (بالعربية)، دون أرقام أو مسافات")]
         public string ThirdName { get; set; }
         [Required]
-        [RegularExpression(@"^[\p{L}]+$", ErrorMessage = "The field must contain only letters (English or Arabic), with no numbers or spaces.")]
+        [RegularExpression(@"^[\p{L}]+$", ErrorMessage = ".يجب أن يحتوي حقل الاسم الرابع على حروف فقط (بالعربية)، دون أرقام أو مسافات")]
         public string ForthName { get; set; }
         [Required]
         public string UserName { get; set; }
         [Required]
-        [RegularExpression(@"^\d{14}$", ErrorMessage = "The National Number field must contain exactly 14 digits with no spaces or other characters.")]
+        [RegularExpression(@"^\d{14}$", ErrorMessage = ".يجب أن يحتوي حقل الرقم القومي على 14 رقمًا بالضبط، دون مسافات أو أحرف أخرى")]
         public string NationalID { get; set; }
         [Required]
         public DateTime HireDate { get; set; }
@@ -28,7 +28,7 @@ namespace Agazaty.Data.DTOs.AccountDTOs
         [EmailAddress(ErrorMessage = "Invalid email format.")]
         public string Email { get; set; }
         [Required]
-        [RegularExpression(@"^\d{11}$", ErrorMessage = "The Phone Number field must contain exactly 11 digits with no spaces or other characters.")]
+        [RegularExpression(@"^\d{11}$", ErrorMessage = ".يجب أن يحتوي حقل رقم الهاتف على 11 رقماً بالضبط دون مسافات أو رموز أخرى")]
         public string PhoneNumber { get; set; }
         [Required]
         public string Gender { get; set; }

@@ -115,7 +115,11 @@ namespace Agazaty
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
+            // Serve static files if your API needs to serve any (e.g., documentation files)
+            app.UseStaticFiles();
 
+            // Enables routing in the app
+            app.UseRouting();
 
             app.UseAuthentication();
             app.UseAuthorization();

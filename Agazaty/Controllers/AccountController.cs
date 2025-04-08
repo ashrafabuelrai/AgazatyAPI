@@ -77,7 +77,7 @@ namespace Agazaty.Controllers
             //var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var user = await _accountService.FindById(model.UseId);
             if (user == null)
-                return NotFound("User not found.");
+                return NotFound(".لم يتم العثور على المستخدم");
 
             var result = await _accountService.ChangePassword(user, model);
             if (!result.Succeeded)
@@ -85,20 +85,20 @@ namespace Agazaty.Controllers
                 var errors = result.Errors.Select(e => e.Description).ToList();
                 return BadRequest(new { Errors = errors });
             }
-            return Ok("Password changed successfully.");
+            return Ok(".تم تغيير كلمة المرور بنجاح");
         }
         //[Authorize]
         [HttpGet("GetUserById/{userID}")]
         public async Task<IActionResult> GetUserById([FromRoute]string userID)
         {
             if (string.IsNullOrWhiteSpace(userID))
-                return BadRequest(new { message = "Invalid user ID." });
+                return BadRequest(new { message = ".معرف المستخدم غير صالح" });
             try
             {
                 var user = await _accountService.FindById(userID);
                 if (user == null)
                 {
-                    return NotFound(new { Message = "User is not found." });
+                    return NotFound(new { Message = ".لم يتم العثور على المستخدم" });
                 }
 
                 var ReturnedUser = _mapper.Map<UserDTO>(user);
@@ -113,7 +113,7 @@ namespace Agazaty.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "An error occurred while processing your request.", error = ex.Message });
+                return StatusCode(500, new { message = ".حدث خطأ أثناء معالجة طلبك", error = ex.Message });
             }
         }
         //[Authorize]
@@ -121,20 +121,20 @@ namespace Agazaty.Controllers
         public async Task<IActionResult> GetRoleOfUser([FromRoute] string userID)
         {
             if (string.IsNullOrWhiteSpace(userID))
-                return BadRequest(new { message = "Invalid user ID." });
+                return BadRequest(new { message = ".معرف المستخدم غير صالح" });
             try
             {
                 var user = await _accountService.FindById(userID);
                 if (user == null)
                 {
-                    return NotFound(new { Message = "User is not found." });
+                    return NotFound(new { Message = ".لم يتم العثور على المستخدم" });
                 }
                 var role =await _accountService.GetFirstRole(user);
                 return Ok(new{role});
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "An error occurred while processing your request.", error = ex.Message });
+                return StatusCode(500, new { message = ".حدث خطأ أثناء معالجة طلبك", error = ex.Message });
             }
         }
         //[Authorize(Roles = "عميد الكلية,أمين الكلية,مدير الموارد البشرية")]
@@ -142,11 +142,11 @@ namespace Agazaty.Controllers
         public async Task<IActionResult> GetUserByNationalId(string NationalId)
         {
             if (string.IsNullOrWhiteSpace(NationalId))
-                return BadRequest(new { message = "Invalid user ID." });
+                return BadRequest(new { message = ".معرف المستخدم غير صالح" });
             try
             {
                 var user = await _accountService.FindByNationalId(NationalId);
-                if (user == null) return NotFound(new { Message = "User is not found." });
+                if (user == null) return NotFound(new { Message = ".لم يتم العثور على المستخدم" });
 
                 var ReturnedUser = _mapper.Map<UserDTO>(user);
                 ReturnedUser.FullName = $"{user.FirstName} {user.SecondName} {user.ThirdName} {user.ForthName}";
@@ -160,7 +160,7 @@ namespace Agazaty.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "An error occurred while processing your request.", error = ex.Message });
+                return StatusCode(500, new { message = ".حدث خطأ أثناء معالجة طلبك", error = ex.Message });
             }
         }
         //[Authorize(Roles = "عميد الكلية,أمين الكلية,مدير الموارد البشرية")]
@@ -170,7 +170,7 @@ namespace Agazaty.Controllers
             try
             {
                 var users = await _accountService.GetAllActiveUsers();
-                if (!users.Any()) { return NotFound(new { Message = "There Are No Users Found."}); }
+                if (!users.Any()) { return NotFound(new { Message = ".لم يتم العثور على أي مستخدمين" }); }
 
                 var ReturnedUsers = _mapper.Map<IEnumerable<UserDTO>>(users);
                 foreach(var ReturnedUser in ReturnedUsers)
@@ -188,7 +188,7 @@ namespace Agazaty.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "An error occurred while processing your request.", error = ex.Message });
+                return StatusCode(500, new { message = ".حدث خطأ أثناء معالجة طلبك", error = ex.Message });
             }
         }
         //[Authorize(Roles = "عميد الكلية,أمين الكلية,مدير الموارد البشرية")]
@@ -198,7 +198,7 @@ namespace Agazaty.Controllers
             try
             {
                 var users = await _accountService.GetAllNonActiveUsers();
-                if (!users.Any()) { return NotFound(new { Message = "There Are No Users Found." }); }
+                if (!users.Any()) { return NotFound(new { Message = ".لم يتم العثور على أي مستخدمين" }); }
 
                 var ReturnedUsers = _mapper.Map<IEnumerable<UserDTO>>(users);
                 foreach (var ReturnedUser in ReturnedUsers)
@@ -216,7 +216,7 @@ namespace Agazaty.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "An error occurred while processing your request.", error = ex.Message });
+                return StatusCode(500, new { message = ".حدث خطأ أثناء معالجة طلبك", error = ex.Message });
             }
         }
         //[Authorize]
@@ -226,10 +226,10 @@ namespace Agazaty.Controllers
             try
             {
                 var u = await _accountService.FindById(userId);
-                if (u == null) return NotFound(new { Message = "User is not found" });
+                if (u == null) return NotFound(new { Message = ".لم يتم العثور على المستخدم" });
 
                 var users = await _accountService.GetAllActiveAvailableCoworkers(u);
-                if (!users.Any()) { return NotFound(new { Message = "There Are No Users Found." }); }
+                if (!users.Any()) { return NotFound(new { Message = ".لم يتم العثور على أي مستخدمين" }); }
 
                 var ReturnedUsers = _mapper.Map<IEnumerable<CoworkerDTO>>(users);
                 foreach (var ReturnedUser in ReturnedUsers)
@@ -247,7 +247,7 @@ namespace Agazaty.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "An error occurred while processing your request.", error = ex.Message });
+                return StatusCode(500, new { message = ".حدث خطأ أثناء معالجة طلبك", error = ex.Message });
             }
         }
         //[Authorize(Roles = "عميد الكلية,أمين الكلية,مدير الموارد البشرية")]
@@ -255,14 +255,14 @@ namespace Agazaty.Controllers
         public async Task<IActionResult> GetAllUsersByDepartmentId(int DepartmentId)
         {
             if (DepartmentId <= 0)
-                return BadRequest(new {Message = "Invalid Department Id."});
+                return BadRequest(new {Message = ".معرف القسم غير صالح" });
             try
             {
                 var dept = await _deptBase.Get(d=>d.Id==DepartmentId);
-                if (dept == null) return NotFound(new { Message = "There is no department found with this id." });
+                if (dept == null) return NotFound(new { Message = ".لم يتم العثور على قسم بهذا المعرف" });
 
                 var users = await _accountService.GetAllUsersByDepartmentId(DepartmentId);
-                if(!users.Any()) return NotFound(new { Message = "There are no users found in this department." });
+                if(!users.Any()) return NotFound(new { Message = ".لم يتم العثور على مستخدمين في هذا القسم" });
 
                 var ReturnedUsers = _mapper.Map<IEnumerable<UserDTO>>(users);
                 foreach (var ReturnedUser in ReturnedUsers)
@@ -280,7 +280,7 @@ namespace Agazaty.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "An error occurred while processing your request.", error = ex.Message });
+                return StatusCode(500, new { message = ".حدث خطأ أثناء معالجة طلبك", error = ex.Message });
             }
         }        
         //[Authorize(Roles = "مدير الموارد البشرية")]
@@ -294,24 +294,24 @@ namespace Agazaty.Controllers
                     if (RoleName == "عميد الكلية" || RoleName == "أمين الكلية" || RoleName == "مدير الموارد البشرية") // ??????????
                     {
                         var list = await _accountService.GetAllUsersInRole(RoleName);
-                        if (list.Any()) return BadRequest(new { Message = $"There is already user has the {RoleName} role, this role should be only assigned to not more than 1 user." });
+                        if (list.Any()) return BadRequest(new { Message = $".يوجد بالفعل مستخدم لديه دور {RoleName} ، يجب أن يُخصص هذا الدور لمستخدم واحد فقط" });
                     }
-                        if (await _accountService.FindByEmail(model.Email) is not null)
-                        return BadRequest(new { Message = "Email is already registered!" });
+                    if (await _accountService.FindByEmail(model.Email) is not null)
+                        return BadRequest(new { Message = "!هذا البريد الإلكتروني مسجل بالفعل" });
 
                     if (await _accountService.FindByNationalId(model.NationalID) is not null)
-                        return BadRequest(new { Message = "NationalID is already registered!" });
+                        return BadRequest(new { Message = "!هذا الرقم القومي مسجل بالفعل" });
 
                     if (await _accountService.FindByName(model.UserName) is not null)
-                        return BadRequest(new { Message = "UserName is already registered!" });
+                        return BadRequest(new { Message = "!هذا اسم المستخدم مسجل بالفعل" });
 
                     if (!await _roleService.IsRoleExisted(RoleName))
-                        return BadRequest(new { Message = "Invalid user ID or Role!" });
+                        return BadRequest(new { Message = "!معرف المستخدم أو المنصب غير صالح" });
 
                     if (model.Departement_ID != null)
                     {
                         if (await _deptBase.Get(d => d.Id == model.Departement_ID) is null)
-                            return BadRequest(new { Message = "Invalid department!" });
+                            return BadRequest(new { Message = "!القسم غير صالح" });
                     }
                     var res = await _accountService.Create(RoleName,model);
                     if (res.Succeeded)
@@ -337,7 +337,7 @@ namespace Agazaty.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "An error occurred while processing your request.", error = ex.Message });
+                return StatusCode(500, new { message = ".حدث خطأ أثناء معالجة طلبك", error = ex.Message });
             }
         }
         //[AllowAnonymous]
@@ -352,7 +352,7 @@ namespace Agazaty.Controllers
                     bool checkPassword = await _accountService.CheckPassword(user, model.Password);
                     if (user is null || !checkPassword)
                     {
-                        return Unauthorized(new { Message = "User Name or Password is incorrect!" });
+                        return Unauthorized(new { Message = "!اسم المستخدم أو كلمة المرور غير صحيحة" });
                     }
 
                     var res = await _accountService.GetTokenAsync(user);
@@ -367,7 +367,7 @@ namespace Agazaty.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "An error occurred while processing your request.", error = ex.Message });
+                return StatusCode(500, new { message = ".حدث خطأ أثناء معالجة طلبك", error = ex.Message });
             }
         }
         //[Authorize(Roles = "مدير الموارد البشرية")]
@@ -375,7 +375,7 @@ namespace Agazaty.Controllers
         public async Task<IActionResult> UdpateUser(string userid, string RoleName, [FromBody]UpdateUserDTO model)
         {
             if (string.IsNullOrWhiteSpace(userid) || string.IsNullOrWhiteSpace(RoleName))
-                return BadRequest(new { message = "Invalid user ID or Role." });
+                return BadRequest(new { message = ".معرف المستخدم أو المنصب غير صحيح" });
 
 
             try
@@ -383,7 +383,7 @@ namespace Agazaty.Controllers
                 if (ModelState.IsValid)
                 {
                     var user = await _accountService.FindById(userid);
-                    if (user == null) return NotFound(new { Message = "User is not found" });
+                    if (user == null) return NotFound(new { Message = ".لم يتم العثور على المستخدم" });
 
                     if (RoleName == "عميد الكلية" || RoleName == "أمين الكلية" || RoleName == "مدير الموارد البشرية") // ??????????
                     {
@@ -393,38 +393,38 @@ namespace Agazaty.Controllers
                             var manager = list.FirstOrDefault();
                             if (manager != null)
                             {
-                                if (manager.Id != userid) return BadRequest(new { Message = $"There is already user has the {RoleName} role, this role should be only assigned to not more than 1 user." });
-                            }
+                                if (manager.Id != userid)
+                                    return BadRequest(new { Message = $".يوجد بالفعل مستخدم لديه دور {RoleName}، يجب أن يكون هذا الدور مخصصًا لمستخدم واحد فقط" });                            }
                         }
                     }
                     var u = await _accountService.FindByEmail(model.Email);
                     if (u != null)
                     {
                         if (u.Id != userid)
-                            return BadRequest(new { Message = "Email is already registered!" });
+                            return BadRequest(new { Message = "!هذا البريد الإلكتروني مسجل بالفعل" });
                     }
 
                     u = await _accountService.FindByNationalId(model.NationalID);
                     if (u != null)
                     {
                         if (u.Id != userid)
-                            return BadRequest(new { Message = "NationalID is already registered!" });
+                            return BadRequest(new { Message = "!هذا الرقم القومي مسجل بالفعل" });
                     }
 
                     u = await _accountService.FindByName(model.UserName);
                     if (u != null)
                     {
                         if (u.Id != userid)
-                            return BadRequest(new { Message = "UserName is already registered!" });
+                            return BadRequest(new { Message = "!هذا اسم المستخدم مسجل بالفعل" });
                     }
 
                     if (!await _roleService.IsRoleExisted(RoleName))
-                        return BadRequest(new { Message = "Invalid Role!" });
+                        return BadRequest(new { Message = "!منصب غير صالح" });
 
                     if (model.Departement_ID != null)
                     {
                         if (await _deptBase.Get(d => d.Id == model.Departement_ID) is null)
-                            return BadRequest(new { Message = "Invalid department!" });
+                            return BadRequest(new { Message = "!القسم غير صالح" });
                     }
 
                     _mapper.Map(model, user);
@@ -467,7 +467,7 @@ namespace Agazaty.Controllers
                             var dpt = await _deptBase.Get(d => d.Id == user.Departement_ID);
                             if(dpt!=null) ReturnedUser.DepartmentName = dpt.Name;
                         }
-                        return Ok(new { Message = "Update is succeeded" , User = ReturnedUser });
+                        return Ok(new { Message = ".تم التحديث بنجاح", User = ReturnedUser });
                     }
                     return BadRequest(res.Errors);
                 }
@@ -476,7 +476,7 @@ namespace Agazaty.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "An error occurred while processing your request.", error = ex.Message });
+                return StatusCode(500, new { message = ".حدث خطأ أثناء معالجة طلبك", error = ex.Message });
             }
         }
         //[Authorize]
@@ -519,7 +519,7 @@ namespace Agazaty.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "An error occurred while processing your request.", error = ex.Message });
+                return StatusCode(500, new { message = ".حدث خطأ أثناء معالجة طلبك", error = ex.Message });
             }
         }
         //[Authorize(Roles = "مدير الموارد البشرية")]
@@ -527,7 +527,7 @@ namespace Agazaty.Controllers
         public async Task<IActionResult> SoftDeleteUser(string userid)
         {
             if (string.IsNullOrWhiteSpace(userid))
-                return BadRequest(new { message = "Invalid user ID." });
+                return BadRequest(new { message = ".معرف المستخدم غير صالح" });
             try
             {
                 var user = await _accountService.FindById(userid);
@@ -536,22 +536,24 @@ namespace Agazaty.Controllers
                     var roleName = await _accountService.GetFirstRole(user);
                     if (roleName == "عميد الكلية" || roleName == "أمين الكلية" || roleName == "مدير الموارد البشرية") // ??????????
                     {
-                        return BadRequest(new { Message = $"This user has {roleName} role. Before deleting this user, you should assign {roleName} role to new user." });
+                        return BadRequest(new { Message = $".هذا المستخدم لديه دور {roleName}. قبل حذف هذا المستخدم، يجب تعيين دور {roleName} لمستخدم جديد." });
+                        //return BadRequest(new { Message = $"This user has {roleName} role. Before deleting this user, you should assign {roleName} role to new user." });
                     }
                     var IsDeptHead = await _deptBase.Get(d => d.ManagerId == user.Id);
                     if (IsDeptHead != null)
                     {
-                        return BadRequest(new { Message = $"This user is {IsDeptHead.Name} department manager, you should assign a new manager to this department before deleting this user." });
+                        return BadRequest(new { Message = $".هذا المستخدم هو مدير قسم {IsDeptHead.Name}، يجب تعيين مدير جديد لهذا القسم قبل حذف هذا المستخدم." });
+                       // return BadRequest(new { Message = $"This user is {IsDeptHead.Name} department manager, you should assign a new manager to this department before deleting this user." });
                     }
                     if (user.Active)
                     {
                         user.Active = false;
                         await _accountService.Update(user);
-                        return Ok(new { Message = "Deletion is succeeded" });
+                        return Ok(new { Message = ".تم الحذف بنجاح" });
                     }
                     else
                     {
-                        return BadRequest(new { Message = "User is already not activiated" });
+                        return BadRequest(new { Message = ".المستخدم غير نشط بالفعل" });
                     }
 
 
@@ -562,11 +564,11 @@ namespace Agazaty.Controllers
                     //}
                     //return BadRequest(res.Errors);
                 }
-                return NotFound(new { Message = "User is not found" });
+                return NotFound(new { Message = ".المستخدم غير موجود" });
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "An error occurred while processing your request.", error = ex.Message });
+                return StatusCode(500, new { message = ".حدث خطأ أثناء معالجة طلبك", error = ex.Message });
             }
         }
         //[Authorize(Roles = "مدير الموارد البشرية")]
@@ -574,7 +576,7 @@ namespace Agazaty.Controllers
         public async Task<IActionResult> ReActiveUser(string userid)
         {
             if (string.IsNullOrWhiteSpace(userid))
-                return BadRequest(new { message = "Invalid user ID." });
+                return BadRequest(new { message =".معرف المستخدم غير صالح" });
             try
             {
                 var user = await _accountService.FindById(userid);
@@ -584,11 +586,11 @@ namespace Agazaty.Controllers
                     {
                         user.Active = true;
                         await _accountService.Update(user);
-                        return Ok(new { Message = "Reactivation is succeeded" });
+                        return Ok(new { Message = "تم التنشيط بنجاح" });
                     }
                     else
                     {
-                        return BadRequest(new { Message = "User is already activiated" });
+                        return BadRequest(new { Message = "المستخدم نشط بالفعل" });
                     }
 
                     //var res = await _accountService.Delete(user);
@@ -598,11 +600,11 @@ namespace Agazaty.Controllers
                     //}
                     //return BadRequest(res.Errors);
                 }
-                return NotFound(new { Message = "User is not found" });
+                return NotFound(new { Message = "المستخدم غير موجود" });
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "An error occurred while processing your request.", error = ex.Message });
+                return StatusCode(500, new { message = ".حدث خطأ أثناء معالجة طلبك", error = ex.Message });
             }
         }
     }
