@@ -15,6 +15,7 @@ using System.Data;
 using static System.Net.WebRequestMethods;
 using System.Security.Principal;
 using System.Runtime.InteropServices;
+using Agazaty.Data.DTOs.AccountDTOs;
 
 namespace Agazaty.Controllers
 {
@@ -202,7 +203,7 @@ namespace Agazaty.Controllers
         {
             try
             {
-                var NormalLeaves = await _base.GetAll(n =>n.LeaveStatus==LeaveStatus.Waiting);
+                var NormalLeaves = await _base.GetAll(n => n.LeaveStatus == LeaveStatus.Waiting);
                 if (!NormalLeaves.Any())
                 {
                     return NotFound(new { message = ".لم يتم العثور على أي إجازات أعتياديه في انتظار الموافقة" });
@@ -561,6 +562,40 @@ namespace Agazaty.Controllers
         public async Task<IActionResult> GetLeaveTypes()
         {
             return Ok(LeaveTypes.res);
+        }
+        //[Authorize(Roles = "عميد الكلية,أمين الكلية,مدير الموارد البشرية")]
+        [HttpPost("MinusOrAddNormalLeavesToUser/{UserID}")]
+        public async Task<IActionResult> MinusOrAddNormalLeavesToUser(string UserID, [FromBody] MinusOrAddNormalLeavesToUser model)
+        {
+
+            if (string.IsNullOrWhiteSpace(UserID))
+                return BadRequest(new { message = ".معرّف المستخدم غير صالح" });
+            try
+            {
+                var user = await _accountService.FindById(UserID);
+                if (user == null)
+                {
+                    return NotFound(new { message = ".لا يوجد مستخدم بهذا المعرف" });
+                }
+                if (model.Decision)
+                {
+                    user.NormalLeavesCount += model.Days;
+                }
+                else
+                {
+                    user.NormalLeavesCount -= model.Days;
+                }
+                await _accountService.Update(user);
+
+
+                return Ok(new { message = ".تم تنفيذ طلبك بنجاح" });
+
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = ".حدث خطأ أثناء معالجة الطلب", error = ex.Message });
+            }
+
         }
         //[Authorize]
         [HttpPost("CreateNormalLeave")]

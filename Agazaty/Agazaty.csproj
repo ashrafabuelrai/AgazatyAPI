@@ -25,7 +25,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<Folder Include="wwwroot\images\Permitleaves\" />
+	  <Folder Include="wwwroot\" />
 	</ItemGroup>
 
 </Project>

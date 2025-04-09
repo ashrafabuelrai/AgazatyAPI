@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Data;
+using System.Net.Http;
 
 namespace Agazaty.Controllers
 {
@@ -228,7 +229,6 @@ namespace Agazaty.Controllers
                         {
                             file.CopyTo(fileStream);
                         }
-
                         PermitLeaveImage permitLeaveImage = new PermitLeaveImage()
                         {
                             ImageUrl = @"\" + permitLeavePath + @"\" + fileName,

@@ -6,16 +6,20 @@ namespace Agazaty.Data.DTOs.AccountDTOs
     public class UpdateUserDTO
     {
         [Required]
-        [RegularExpression(@"^[\p{L}]+$", ErrorMessage = ".يجب أن يحتوي حقل الاسم الأول على حروف فقط (بالعربية)، دون أرقام أو مسافات")]
+        [RegularExpression(@"^[\u0621-\u063A\u0641-\u064A\u0622-\u0626\u0640]+$",
+        ErrorMessage = "يجب أن يحتوي الاسم الأول على حروف عربية فقط بدون أرقام أو رموز أو مسافات")]
         public string FirstName { get; set; }
         [Required]
-        [RegularExpression(@"^[\p{L}]+$", ErrorMessage = ".يجب أن يحتوي حقل الاسم الثاني على حروف فقط (بالعربية)، دون أرقام أو مسافات")]
+        [RegularExpression(@"^[\u0621-\u063A\u0641-\u064A\u0622-\u0626\u0640]+$",
+        ErrorMessage = "يجب أن يحتوي الاسم الثاني على حروف عربية فقط بدون أرقام أو رموز أو مسافات")]
         public string SecondName { get; set; }
         [Required]
-        [RegularExpression(@"^[\p{L}]+$", ErrorMessage = ".يجب أن يحتوي حقل الاسم الثالث على حروف فقط (بالعربية)، دون أرقام أو مسافات")]
+        [RegularExpression(@"^[\u0621-\u063A\u0641-\u064A\u0622-\u0626\u0640]+$",
+        ErrorMessage = "يجب أن يحتوي الاسم الثالث على حروف عربية فقط بدون أرقام أو رموز أو مسافات")]
         public string ThirdName { get; set; }
         [Required]
-        [RegularExpression(@"^[\p{L}]+$", ErrorMessage = ".يجب أن يحتوي حقل الاسم الرابع على حروف فقط (بالعربية)، دون أرقام أو مسافات")]
+        [RegularExpression(@"^[\u0621-\u063A\u0641-\u064A\u0622-\u0626\u0640]+$",
+        ErrorMessage = "يجب أن يحتوي الاسم الرابع على حروف عربية فقط بدون أرقام أو رموز أو مسافات")]
         public string ForthName { get; set; }
         [Required]
         public string UserName { get; set; }

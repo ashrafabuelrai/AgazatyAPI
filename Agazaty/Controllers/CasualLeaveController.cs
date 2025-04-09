@@ -179,7 +179,7 @@ namespace Agazaty.Controllers
                 {
                     return BadRequest(new { Message = ".يجب أن تكون فترة الإجازة في الماضي" });
                 }
-                if((model.EndDate - model.StartDate).TotalDays > 1)
+                if((model.EndDate - model.StartDate).TotalDays+1 > 2)
                 {
                     return BadRequest(new { Message = ".لقد تجاوزت العدد المسموح به من الأيام، يمكنك اختيار يوم أو يومين فقط" });
                 }
@@ -239,9 +239,9 @@ namespace Agazaty.Controllers
                 {
                     return BadRequest(new { Message = ".يجب أن تكون فترة الإجازة في الماضي" });
                 }
-                if ((model.EndDate - model.StartDate).TotalDays > 1)
+                if ((model.EndDate - model.StartDate).TotalDays +1 > 2)
                 {
-                    return BadRequest(new { Message = ".لقد تجاوزت العدد المسموح به من الأيام" });
+                    return BadRequest(new { Message = ".لقد تجاوزت العدد المسموح به من الأيام، يمكنك اختيار يوم أو يومين فقط" });
                 }
                 if ((model.EndDate - model.StartDate).TotalDays < 0)
                 {

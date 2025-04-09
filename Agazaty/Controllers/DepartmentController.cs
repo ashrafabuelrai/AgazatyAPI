@@ -95,14 +95,13 @@ namespace Agazaty.Controllers
                 var res = await _accountService.FindById(model.ManagerId);
                 if (res == null)
                 {
-                    return NotFound(new { Message = ".لم يتم العثور على المدير" });
+                    return NotFound(new { Message = ".معرّف المستخدم غير موجود" });
                 }
                 // to check : is user whose id is equal model.managerid exists in another department ?
                 var IsExistsInAnotherDepartment = await _base.Get(d => d.Id == res.Departement_ID);
                 if (IsExistsInAnotherDepartment != null) // this means that user exists in another department
                 {
                     return BadRequest(new { Message = $".المستخدم موجود في قسم {IsExistsInAnotherDepartment.Name}، يرجى جعله بدون قسم حتى تتمكن من تعيينه مديرًا للقسم الذي تنشئه الآن" });
-
                 }
                 //var IsAlreadyManager = await _base.Get(d => d.ManagerId == model.ManagerId);
                 //if (IsAlreadyManager != null)
@@ -142,7 +141,7 @@ namespace Agazaty.Controllers
                 var res = await _accountService.FindById(model.ManagerId);
                 if (res == null)
                 {
-                    return NotFound(new { Message = ".لم يتم العثور على المدير" });
+                    return NotFound(new { Message = ".معرّف المستخدم غير موجود" });
                 }
 
                 var department = await _base.Get(d => d.Id == departmentID);
@@ -165,7 +164,6 @@ namespace Agazaty.Controllers
                     if (IsExistsInAnotherDepartment.Id != department.Id)
                     {
                         return BadRequest(new { Message = $".المستخدم موجود في قسم {IsExistsInAnotherDepartment.Name}. قم بإضافة المستخدم كعضو في قسم {department.Name} أو جعله بدون قسم، حتى تتمكن من تعيينه رئيسًا لقسم {department.Name}" });
-
                     }
                 }
                 _mapper.Map(model, department);
@@ -201,9 +199,8 @@ namespace Agazaty.Controllers
                 var users = await _accountService.GetAllUsersByDepartmentId(departmentID);
                 if (users.Any())
                 {
-                    return BadRequest(new { Message = "هذا القسم يحتوي على أعضاء، قم بتعديل قسمهم إلى قسم آخر حتى تتمكن من حذف هذا القسم." });
+                    return BadRequest(new { Message = ".هذا القسم يحتوي على أعضاء، قم بتعديل قسمهم إلى قسم آخر حتى تتمكن من حذف هذا القسم" });
                 }
-
                 await _base.Remove(department);
 
                 return Ok(".تم حذف القسم بنجاح");

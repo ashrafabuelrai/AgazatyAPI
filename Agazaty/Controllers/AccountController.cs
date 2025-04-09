@@ -536,7 +536,7 @@ namespace Agazaty.Controllers
                     var roleName = await _accountService.GetFirstRole(user);
                     if (roleName == "عميد الكلية" || roleName == "أمين الكلية" || roleName == "مدير الموارد البشرية") // ??????????
                     {
-                        return BadRequest(new { Message = $".هذا المستخدم لديه دور {roleName}. قبل حذف هذا المستخدم، يجب تعيين دور {roleName} لمستخدم جديد." });
+                        return BadRequest(new { Message = $".هذا المستخدم لديه منصب {roleName}. قبل حذف هذا المستخدم، يجب تعيين منصب {roleName} لمستخدم جديد." });
                         //return BadRequest(new { Message = $"This user has {roleName} role. Before deleting this user, you should assign {roleName} role to new user." });
                     }
                     var IsDeptHead = await _deptBase.Get(d => d.ManagerId == user.Id);
