@@ -337,11 +337,11 @@ namespace Agazaty.Controllers
                     }
                     var errors = new List<string>();
                     DateTime today = DateTime.Today;
-                    if (model.EndDate <= today)
-                        errors.Add(".فترة الإجازة قد انتهت بالفعل. يرجى اختيار تواريخ مستقبلية");
+                    //if (model.EndDate <= today)
+                    //    errors.Add(".فترة الإجازة قد انتهت بالفعل. يرجى اختيار تواريخ مستقبلية");
 
-                    if (model.StartDate <= today)
-                        errors.Add(".لا يمكن أن يكون تاريخ البداية في الماضي. يرجى اختيار تاريخ مستقبلي");
+                    //if (model.StartDate <= today)
+                    //    errors.Add(".لا يمكن أن يكون تاريخ البداية في الماضي. يرجى اختيار تاريخ مستقبلي");
 
                     if (model.StartDate > model.EndDate)
                         errors.Add(".لا يمكن أن يكون تاريخ البداية بعد تاريخ النهاية");

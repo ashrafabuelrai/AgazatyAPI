@@ -198,7 +198,7 @@ namespace Agazaty.Controllers
         [HttpPost("CreatePermitLeave", Name = "CreatePermitLeave")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<PermitLeave>> CreatePermitLeave([FromForm] CreatePermitLeaveDTO model, [FromForm] List<IFormFile>? files)
+        public async Task<ActionResult<PermitLeave>> CreatePermitLeave([FromForm] CreatePermitLeaveDTO model,IFormFile? file)
         {
             try
             {
@@ -208,15 +208,15 @@ namespace Agazaty.Controllers
                 }
                 
                 if (model.Hours <= 0) return BadRequest(new { Message = ".عدد الساعات يجب أن يكون أكثر من 0" });
-                if(await _accountService.FindById(model.UserId) is null) return BadRequest(new { Message = ".المستخدم غير موجود" });
+                if (model.Hours > 3) return BadRequest(new { Message = ".عدد الساعات لا يمكن أن  تكون علي الأكثر تلت ساعات" });
+
+                if (await _accountService.FindById(model.UserId) is null) return BadRequest(new { Message = ".المستخدم غير موجود" });
 
                 var permitLeave = _mapper.Map<PermitLeave>(model);
 
                 string wwwRootPath = _webHostEnvironment.WebRootPath;
-                if (files != null)
-                {
-                    foreach (var file in files)
-                    {
+                if (file != null)
+                {          
                         string fileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
                         string permitLeavePath = @"images\PermitLeaves\PermitLeaveUser-" + permitLeave.UserId;
                         string finalPath = Path.Combine(wwwRootPath, permitLeavePath);
@@ -236,12 +236,12 @@ namespace Agazaty.Controllers
                         };
 
 
-                        if (permitLeave.PermitLeaveImages == null)
+                        if (permitLeave.PermitLeaveImage == null)
                         {
-                            permitLeave.PermitLeaveImages = new List<PermitLeaveImage>();
+                            permitLeave.PermitLeaveImage = new PermitLeaveImage();
                         }
-                        permitLeave.PermitLeaveImages.Add(permitLeaveImage);
-                    }
+                        permitLeave.PermitLeaveImage=permitLeaveImage;
+                    
                 }
                 await _Permitbase.Add(permitLeave);
 
@@ -260,7 +260,7 @@ namespace Agazaty.Controllers
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> UpdatePermitLeave(int leaveID, [FromForm] UpdatePermitLeaveDTO model, [FromForm] List<IFormFile>? files) 
+        public async Task<IActionResult> UpdatePermitLeave(int leaveID, [FromForm] UpdatePermitLeaveDTO model, IFormFile? file) 
         {
             if (leaveID<=0)
             {
@@ -285,10 +285,10 @@ namespace Agazaty.Controllers
                 _mapper.Map(model, permitLeave);
 
                 string wwwRootPath = _webHostEnvironment.WebRootPath;
-                if (files != null)
+                if (file != null)
                 {
-                    foreach (var file in files)
-                    {
+                    
+                    
                         string fileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
                         string permitLeavePath = @"images\PermitLeaves\PermitLeaveUser-" + permitLeave.UserId;
                         string finalPath = Path.Combine(wwwRootPath, permitLeavePath);
@@ -309,12 +309,12 @@ namespace Agazaty.Controllers
                         };
 
 
-                        if (permitLeave.PermitLeaveImages == null)
+                        if (permitLeave.PermitLeaveImage == null)
                         {
-                            permitLeave.PermitLeaveImages = new List<PermitLeaveImage>();
+                            permitLeave.PermitLeaveImage = new PermitLeaveImage();
                         }
-                        permitLeave.PermitLeaveImages.Add(permitLeaveImage);
-                    }
+                        permitLeave.PermitLeaveImage=permitLeaveImage;
+                    
                 }
                 await _Permitbase.Update(permitLeave);
 

@@ -12,7 +12,7 @@ namespace Agazaty.Models
         [Required]
         [ForeignKey("User")]
         public string UserId { get; set; }
-        public List<PermitLeaveImage>? PermitLeaveImages { get; set; }
+        public PermitLeaveImage? PermitLeaveImage { get; set; }
         public ApplicationUser User { get; set; }
     }
 }
