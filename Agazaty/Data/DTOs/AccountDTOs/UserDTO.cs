@@ -33,6 +33,7 @@ namespace Agazaty.Data.DTOs.AccountDTOs
         public string? State { get; set; }
         public bool Disability { get; set; }
         public bool IsDirectManager { get; set; }
+        public string Gender { get; set; }
 
     }
 }
