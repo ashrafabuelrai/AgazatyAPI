@@ -34,13 +34,13 @@ namespace Agazaty.Controllers
         public async Task<ActionResult<CasualLeaveDTO>> GetCasualLeaveById(int leaveID)
         {
             if (leaveID <= 0)
-                return BadRequest(new { message = ".معرّف الإجازة العارضة غير صالح" });
+                return BadRequest(new { message = "معرّف الإجازة العارضة غير صالح." });
             try
             {
                 var casualLeave = await _base.Get(c => c.Id == leaveID);
                 if (casualLeave == null)
                 {
-                    return NotFound(new { Message = ".لم يتم العثور على أي إجازة عارضة" });
+                    return NotFound(new { Message = "لم يتم العثور على أي إجازة عارضة." });
                 }
                 var leave = _mapper.Map<CasualLeaveDTO>(casualLeave);
                 var user = await _accountService.FindById(leave.UserId);
@@ -49,7 +49,7 @@ namespace Agazaty.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = ".حدث خطأ أثناء معالجة الطلب", error = ex.Message });
+                return StatusCode(500, new { message = "حدث خطأ أثناء معالجة الطلب.", error = ex.Message });
             }
         }
         //[Authorize(Roles = "عميد الكلية,أمين الكلية,مدير الموارد البشرية")]
@@ -63,7 +63,7 @@ namespace Agazaty.Controllers
                 var casualLeaves = await _base.GetAll();
                 if (!casualLeaves.Any())
                 {
-                    return NotFound(new {Message = ".لم يتم العثور على أي إجازات عارضة" });
+                    return NotFound(new { Message = "لم يتم العثور على أي إجازات عارضة." });
                 }
                 var leaves = _mapper.Map<IEnumerable<CasualLeaveDTO>>(casualLeaves);
                 foreach(var leave in leaves)
@@ -75,7 +75,7 @@ namespace Agazaty.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = ".حدث خطأ أثناء معالجة الطلب", error = ex.Message });
+                return StatusCode(500, new { message = "حدث خطأ أثناء معالجة الطلب.", error = ex.Message });
             }
         }
         //[Authorize]
@@ -85,13 +85,13 @@ namespace Agazaty.Controllers
         public async Task<ActionResult<IEnumerable<CasualLeaveDTO>>> GetAllCasualLeavesByUserID(string userID)
         {
             if (string.IsNullOrWhiteSpace(userID))
-                return BadRequest(new { message = ".معرف المستخدم غير صالح" });
+                return BadRequest(new { message = "معرف المستخدم غير صالح." });
             try
             {
                 var casualLeaves = await _base.GetAll(c => c.UserId == userID);
                 if(!casualLeaves.Any())
                 {
-                    return NotFound(new {Message= ".لم يتم العثور على أي إجازات عارضة" });
+                    return NotFound(new { Message = "لم يتم العثور على أي إجازات عارضة." });
                 }
                 var leaves = _mapper.Map<IEnumerable<CasualLeaveDTO>>(casualLeaves);
                 foreach (var leave in leaves)
@@ -103,7 +103,7 @@ namespace Agazaty.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = ".حدث خطأ أثناء معالجة الطلب", error = ex.Message });
+                return StatusCode(500, new { message = "حدث خطأ أثناء معالجة الطلب.", error = ex.Message });
             }
         }
         //[Authorize]
@@ -113,14 +113,14 @@ namespace Agazaty.Controllers
         public async Task<ActionResult<IEnumerable<CasualLeaveDTO>>> GetAllCasualLeavesByUserIDAndYear(string userID, int year)
         {
             if (string.IsNullOrWhiteSpace(userID) || year < 1900)
-                return BadRequest(new { message = ".معرف المستخدم أو السنة غير صالح" });
+                return BadRequest(new { message = "معرف المستخدم أو السنة غير صالح." });
             try
             {
                 var casualLeaves = await _base.GetAll(c => c.UserId == userID
                                   && c.Year == year);
                 if (!casualLeaves.Any())
                 {
-                    return NotFound(new {Message= ".لم يتم العثور على أي إجازات عارضة" });
+                    return NotFound(new { Message = "لم يتم العثور على أي إجازات عارضة." });
                 }
                 var leaves = _mapper.Map<IEnumerable<CasualLeaveDTO>>(casualLeaves);
                 foreach (var leave in leaves)
@@ -132,7 +132,7 @@ namespace Agazaty.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = ".حدث خطأ أثناء معالجة الطلب", error = ex.Message });
+                return StatusCode(500, new { message = "حدث خطأ أثناء معالجة الطلب.", error = ex.Message });
             }
         }
         //[Authorize]
@@ -153,12 +153,12 @@ namespace Agazaty.Controllers
                 }
                 if (await _leaveValidationService.IsSameLeaveOverlapping(model.UserId, model.StartDate, model.EndDate, "CasualLeave"))
                 {
-                    return BadRequest(".لديك بالفعل إجازة عارضة في هذه الفترة");
+                    return BadRequest("لديك بالفعل إجازة عارضة في هذه الفترة!");
                 }
 
                 if (await _leaveValidationService.IsLeaveOverlapping(model.UserId, model.StartDate, model.EndDate, "CasualLeave"))
                 {
-                    return BadRequest(".لديك بالفعل إجازة من نوع آخر في هذه الفترة");
+                    return BadRequest("لديك بالفعل إجازة من نوع آخر في هذه الفترة!");
                 }
                 ApplicationUser user = await _accountService.FindById(model.UserId);
                 //var allCasualLeave = await _base.GetAll(u => u.UserId == user.Id);
@@ -173,19 +173,19 @@ namespace Agazaty.Controllers
                 //}
                 if (((model.EndDate-model.StartDate).TotalDays + 1) > user.CasualLeavesCount)
                 {
-                    return BadRequest(new { Message = $".لا يمكن إتمام الطلب، عدد الأيام المتاحة لك هي {user.CasualLeavesCount}." });
+                    return BadRequest(new { Message = $"لا يمكن إتمام الطلب، عدد الأيام المتاحة لك هي {user.CasualLeavesCount}." });
                 }
                 if (model.EndDate >= DateTime.Today || model.StartDate >= DateTime.Today)
                 {
-                    return BadRequest(new { Message = ".يجب أن تكون فترة الإجازة في الماضي" });
+                    return BadRequest(new { Message = "يجب أن تكون فترة الإجازة في الماضي." });
                 }
-                if((model.EndDate - model.StartDate).TotalDays+1 > 2)
+                if ((model.EndDate - model.StartDate).TotalDays+1 > 2)
                 {
-                    return BadRequest(new { Message = ".لقد تجاوزت العدد المسموح به من الأيام، يمكنك اختيار يوم أو يومين فقط" });
+                    return BadRequest(new { Message = "لقد تجاوزت العدد المسموح به من الأيام، يمكنك اختيار يوم أو يومين فقط." });
                 }
                 if ((model.EndDate - model.StartDate).TotalDays < 0)
                 {
-                    return BadRequest(new {Message= ".يجب أن يكون تاريخ البدء قبل تاريخ الانتهاء" });
+                    return BadRequest(new { Message = "يجب أن يكون تاريخ البدء قبل تاريخ الانتهاء." });
                 }
 
                 var casualLeave = _mapper.Map<CasualLeave>(model);
@@ -202,7 +202,7 @@ namespace Agazaty.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = ".حدث خطأ أثناء معالجة الطلب", error = ex.Message });
+                return StatusCode(500, new { message = "حدث خطأ أثناء معالجة الطلب.", error = ex.Message });
             }
         }
         //[Authorize(Roles = "عميد الكلية,أمين الكلية,مدير الموارد البشرية")]
@@ -214,7 +214,7 @@ namespace Agazaty.Controllers
         {
             if (leaveID <= 0)
             {
-                 return BadRequest(new {Message= ".معرف الإجازة غير صالح" });
+                return BadRequest(new { Message = "معرف الإجازة غير صالح." });
             }
             try
             {
@@ -225,7 +225,7 @@ namespace Agazaty.Controllers
                 var casualLeave = await _base.Get(c => c.Id == leaveID);
                 if (casualLeave == null)
                 {
-                    return NotFound(new { Message = ".لم يتم العثور على إجازة عارضة بهذا المعرف" });
+                    return NotFound(new { Message = "لم يتم العثور على إجازة عارضة بهذا المعرف." });
                 }
 
                 var user = await _accountService.FindById(model.UserId);
@@ -233,19 +233,19 @@ namespace Agazaty.Controllers
 
                 if (((model.EndDate - model.StartDate).TotalDays + 1) > user.CasualLeavesCount)
                 {
-                    return BadRequest(new { Message = $".عدد الأيام المتاحة لك هو {user.CasualLeavesCount}." });
+                    return BadRequest(new { Message = $"عدد الأيام المتاحة لك هو {user.CasualLeavesCount}." });
                 }
                 if (model.EndDate >= DateTime.Today || model.StartDate >= DateTime.Today)
                 {
-                    return BadRequest(new { Message = ".يجب أن تكون فترة الإجازة في الماضي" });
+                    return BadRequest(new { Message = "يجب أن تكون فترة الإجازة في الماضي." });
                 }
                 if ((model.EndDate - model.StartDate).TotalDays +1 > 2)
                 {
-                    return BadRequest(new { Message = ".لقد تجاوزت العدد المسموح به من الأيام، يمكنك اختيار يوم أو يومين فقط" });
+                    return BadRequest(new { Message = "لقد تجاوزت العدد المسموح به من الأيام، يمكنك اختيار يوم أو يومين فقط." });
                 }
                 if ((model.EndDate - model.StartDate).TotalDays < 0)
                 {
-                    return BadRequest(new { Message = ".يجب أن يكون تاريخ البدء قبل تاريخ الانتهاء" });
+                    return BadRequest(new { Message = "يجب أن يكون تاريخ البدء قبل تاريخ الانتهاء." });
                 }
 
 
@@ -257,11 +257,11 @@ namespace Agazaty.Controllers
 
                 var leave = _mapper.Map<CasualLeaveDTO>(casualLeave);
                 leave.UserName = $"{user.FirstName} {user.SecondName} {user.ThirdName} {user.ForthName}";
-                return Ok(new { Message = ".تم التحديث بنجاح", CasualLeaveDetails = leave});
+                return Ok(new { Message = "تم التحديث بنجاح.", CasualLeaveDetails = leave });
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = ".حدث خطأ أثناء معالجة الطلب", error = ex.Message });
+                return StatusCode(500, new { message = "حدث خطأ أثناء معالجة الطلب.", error = ex.Message });
             }
         }
         //[Authorize(Roles = "عميد الكلية,أمين الكلية,مدير الموارد البشرية")]
@@ -273,21 +273,21 @@ namespace Agazaty.Controllers
         {
             if (leaveID<=0)
             {
-                return BadRequest(new { Message = ".معرف الإجازة غير صالح" });
+                return BadRequest(new { Message = "معرف الإجازة غير صالح." });
             }
             try
             {
                 var casualLeave = await _base.Get(c => c.Id == leaveID);
                 if (casualLeave == null)
                 {
-                    return NotFound(new { Message = ".لم يتم العثور على إجازة عارضة بهذا المعرف" });
+                    return NotFound(new { Message = "لم يتم العثور على إجازة عارضة بهذا المعرف." });
                 }
                 await _base.Remove(casualLeave);
-                return Ok(new { Message = ".تم الحذف بنجاح" });
+                return Ok(new { Message = "تم الحذف بنجاح." });
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = ".حدث خطأ أثناء معالجة الطلب", error = ex.Message });
+                return StatusCode(500, new { message = "حدث خطأ أثناء معالجة الطلب.", error = ex.Message });
             }
         }
     }

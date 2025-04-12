@@ -8,15 +8,15 @@ namespace Agazaty.Data.DTOs.AccountDTOs
         [Required]
         public string UserName { get; set; }
         [Required]
-        [RegularExpression(@"^\d{11}$", ErrorMessage = ".يجب أن يحتوي حقل رقم الهاتف على 11 رقماً بالضبط دون مسافات أو رموز أخرى")]
+        [RegularExpression(@"^\d{11}$", ErrorMessage = "يجب أن يحتوي حقل رقم الهاتف على 11 رقماً بالضبط دون مسافات أو رموز أخرى.")]
         public string PhoneNumber { get; set; }
-        [Required]
-        [EmailAddress(ErrorMessage = ".تنسيق البريد الإلكتروني غير صحيح")]
+        [Required(ErrorMessage = "البريد الإلكتروني مطلوب.")]
+        [EmailAddress(ErrorMessage = "تنسيق البريد الإلكتروني غير صحيح.")]
         public string Email { get; set; }
-        [Required]
         //[RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$",
         // ErrorMessage = "Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character.")]
         //[DataType(DataType.Password)]
+        [Required(ErrorMessage = "كلمة المرور مطلوبة.")]
         public string Password { get; set; }
         [Required]
         [RegularExpression(@"^[\u0621-\u063A\u0641-\u064A\u0622-\u0626\u0640]+$",
@@ -41,7 +41,7 @@ namespace Agazaty.Data.DTOs.AccountDTOs
         [Required]
         public DateTime HireDate { get; set; }
         [Required]
-        [RegularExpression(@"^\d{14}$", ErrorMessage = ".يجب أن يحتوي حقل الرقم القومي على 14 رقمًا بالضبط، دون مسافات أو أحرف أخرى")]
+        [RegularExpression(@"^\d{14}$", ErrorMessage = "يجب أن يحتوي حقل الرقم القومي على 14 رقمًا بالضبط، دون مسافات أو أحرف أخرى.")]
         public string NationalID { get; set; }
         [Required]
         public int position { get; set; }

@@ -366,7 +366,7 @@ namespace Agazaty.Data.Services.Implementation
             var Account = await FindByEmail(DTO.Email);
             if (Account == null)
             {
-                return new ForgetPassResponse { Message = ".لم يتم العثور على المستخدم" };
+                return new ForgetPassResponse { Message = "لم يتم العثور على المستخدم." };
             }
             //if (Account.UserName != DTO.UserName)
             //{
@@ -379,7 +379,7 @@ namespace Agazaty.Data.Services.Implementation
             var Account = await FindByEmail(DTO.email);
             if (Account == null)
             {
-                return new ForgetPassResponse { Message = ".لم يتم العثور على المستخدم" };
+                return new ForgetPassResponse { Message = "لم يتم العثور على المستخدم." };
             }
             //if (/*DTO.token == null || DTO.token != Account.OTP ||*/ DateTime.UtcNow > Account.OTPExpiry)
             //{
@@ -399,7 +399,7 @@ namespace Agazaty.Data.Services.Implementation
                 }
                 return new ForgetPassResponse { Message = errors };
             }
-            return new ForgetPassResponse { Email = Account.Email, Message = ".تم تغيير كلمة المرور بنجاح", IsAuthenticated=true };
+            return new ForgetPassResponse { Email = Account.Email, Message = "تم تغيير كلمة المرور بنجاح.", IsAuthenticated =true };
             //var result=await _UserManager.ResetPasswordAsync(user, token, NewPassword);
         }
         private string GenerateOTP()
@@ -413,11 +413,11 @@ namespace Agazaty.Data.Services.Implementation
             var account = await FindByEmail(email);
             if (account == null)
             {
-                return new ForgetPassResponse {  Message = ".الحساب غير موجود" };
+                return new ForgetPassResponse { Message = "الحساب غير موجود." };
             }
             if (account.OTP != null && account.OTPExpiry > DateTime.UtcNow)
             {
-                return new ForgetPassResponse { Email = account.Email, Message = ".تم إرسال الرقم السري بالفعل" };
+                return new ForgetPassResponse { Email = account.Email, Message = "تم إرسال الرقم السري بالفعل."};
             }
             string OTP = GenerateOTP();
             account.OTP = OTP;
@@ -427,22 +427,22 @@ namespace Agazaty.Data.Services.Implementation
             {
                 Email = account.Email,
                 Subject = "الرقم السري الخاص بك",
-                Body = $".الرقم السري الخاص بك هو {OTP}"
+                Body = $"الرقم السري الخاص بك هو: {OTP}"
             };
             await _EmailService.SendEmail(emailrequest);
 
-            return new ForgetPassResponse { Email = account.Email, IsAuthenticated=true, Message = ".تم إرسال الرقم السري إلى بريدك الإلكتروني" };
+            return new ForgetPassResponse { Email = account.Email, IsAuthenticated=true, Message = "تم إرسال الرقم السري إلى بريدك الإلكتروني."};
         }
         public async Task<ForgetPassResponse> VerifyOtpAsync(string Email, string enteredOtp)
         {
             ApplicationUser? Account = await _userManager.FindByEmailAsync(Email);
             if (Account == null)
             {
-                return new ForgetPassResponse { Message = ".لم يتم العثور على المستخدم" };
+                return new ForgetPassResponse { Message = "لم يتم العثور على المستخدم." };
             }
             if (enteredOtp == null || enteredOtp != Account.OTP || DateTime.UtcNow > Account.OTPExpiry)
             {
-                return new ForgetPassResponse { Email = Account.Email, Message = ".الرقم السري غير صحيح" };
+                return new ForgetPassResponse { Email = Account.Email, Message = "الرقم السري غير صحيح."};
             }
 
             Account.OTP = null;
@@ -460,7 +460,7 @@ namespace Agazaty.Data.Services.Implementation
                 IsAuthenticated = true,
                 ////Roles = await _userManager.GetRolesAsync(Account),
                 //Token = new JwtSecurityTokenHandler().WriteToken(JwtSecurityToken),
-                Message = ".الرقم السري صحيح",
+                Message = "الرقم السري صحيح.",
                 Email = Account.Email
             };
         }

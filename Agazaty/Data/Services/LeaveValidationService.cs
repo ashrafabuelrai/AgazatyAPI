@@ -110,7 +110,7 @@ namespace Agazaty.Data.Services
             // التأكد من أن تاريخ البداية ليس بعد تاريخ النهاية
             if (startDate > endDate)
             {
-                throw new ArgumentException(".تاريخ البداية يجب أن يكون قبل تاريخ النهاية");
+                throw new ArgumentException("تاريخ البداية يجب أن يكون قبل تاريخ النهاية.");
             }
             int leaveDays = 0;
 

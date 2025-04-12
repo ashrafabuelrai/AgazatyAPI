@@ -35,7 +35,7 @@ namespace Agazaty.Controllers
 
                 if (!departments.Any())
                 {
-                    return NotFound(".لم يتم العثور على أقسام");
+                    return NotFound("لم يتم العثور على أقسام.");
                 }
                 var depts = _mapper.Map<IEnumerable<DepartmentDTO>>(departments);
                 foreach(var dept in depts)
@@ -47,7 +47,7 @@ namespace Agazaty.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = ".حدث خطأ أثناء معالجة طلبك", error = ex.Message });
+                return StatusCode(500, new { message = "حدث خطأ أثناء معالجة طلبك.", error = ex.Message });
             }
         }
         //[Authorize(Roles = "مدير الموارد البشرية")]
@@ -56,7 +56,7 @@ namespace Agazaty.Controllers
         {
             if (departmentID <= 0)
             {
-                return BadRequest(new { Message = ".معرّف القسم غير صالح" });
+                return BadRequest(new { Message = "معرّف القسم غير صالح." });
             }
             try
             {
@@ -64,7 +64,7 @@ namespace Agazaty.Controllers
 
                 if (department == null)
                 {
-                    return NotFound($".لا يوجد قسم بالمعرّف {departmentID}");
+                    return NotFound($"لا يوجد قسم بالمعرّف {departmentID}.");
                 }
 
                 var dept = _mapper.Map<DepartmentDTO>(department);
@@ -74,7 +74,7 @@ namespace Agazaty.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = ".حدث خطأ أثناء معالجة طلبك", error = ex.Message });
+                return StatusCode(500, new { message = "حدث خطأ أثناء معالجة طلبك.", error = ex.Message });
             }
         }
         //[Authorize(Roles = "مدير الموارد البشرية")]
@@ -86,7 +86,7 @@ namespace Agazaty.Controllers
             {
                 if (model == null)
                 {
-                    return BadRequest(".بيانات القسم غير صالحة");
+                    return BadRequest("بيانات القسم غير صالحة.");
                 }
                 if (!ModelState.IsValid)
                 {
@@ -95,13 +95,13 @@ namespace Agazaty.Controllers
                 var res = await _accountService.FindById(model.ManagerId);
                 if (res == null)
                 {
-                    return NotFound(new { Message = ".معرّف المستخدم غير موجود" });
+                    return NotFound(new { Message = "معرّف المستخدم غير موجود." });
                 }
                 // to check : is user whose id is equal model.managerid exists in another department ?
                 var IsExistsInAnotherDepartment = await _base.Get(d => d.Id == res.Departement_ID);
                 if (IsExistsInAnotherDepartment != null) // this means that user exists in another department
                 {
-                    return BadRequest(new { Message = $".المستخدم موجود في قسم {IsExistsInAnotherDepartment.Name}، يرجى جعله بدون قسم حتى تتمكن من تعيينه مديرًا للقسم الذي تنشئه الآن" });
+                    return BadRequest(new { Message = $"المستخدم موجود في قسم {IsExistsInAnotherDepartment.Name}، يرجى جعله بدون قسم حتى تتمكن من تعيينه مديرًا للقسم الذي تنشئه الآن." });
                 }
                 //var IsAlreadyManager = await _base.Get(d => d.ManagerId == model.ManagerId);
                 //if (IsAlreadyManager != null)
@@ -120,7 +120,7 @@ namespace Agazaty.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = ".حدث خطأ أثناء معالجة طلبك", error = ex.Message });
+                return StatusCode(500, new { message = "حدث خطأ أثناء معالجة طلبك.", error = ex.Message });
             }
         }
         //[Authorize(Roles = "مدير الموارد البشرية")]
@@ -129,7 +129,7 @@ namespace Agazaty.Controllers
         {
             if (departmentID<=0)
             {
-                return BadRequest(".بيانات القسم غير صالحة");
+                return BadRequest("بيانات القسم غير صالحة.");
             }
 
             try
@@ -141,13 +141,13 @@ namespace Agazaty.Controllers
                 var res = await _accountService.FindById(model.ManagerId);
                 if (res == null)
                 {
-                    return NotFound(new { Message = ".معرّف المستخدم غير موجود" });
+                    return NotFound(new { Message = "معرّف المستخدم غير موجود." });
                 }
 
                 var department = await _base.Get(d => d.Id == departmentID);
                 if (department == null)
                 {
-                    return NotFound(new { Message = ".لم يتم العثور على القسم" });
+                    return NotFound(new { Message = "لم يتم العثور على القسم." });
                 }
                 //var IsAlreadyManager = await _base.Get(d => d.ManagerId == model.ManagerId);
                 //if(IsAlreadyManager != null)
@@ -163,7 +163,7 @@ namespace Agazaty.Controllers
                 {
                     if (IsExistsInAnotherDepartment.Id != department.Id)
                     {
-                        return BadRequest(new { Message = $".المستخدم موجود في قسم {IsExistsInAnotherDepartment.Name}. قم بإضافة المستخدم كعضو في قسم {department.Name} أو جعله بدون قسم، حتى تتمكن من تعيينه رئيسًا لقسم {department.Name}" });
+                        return BadRequest(new { Message = $"المستخدم موجود في قسم {IsExistsInAnotherDepartment.Name}. قم بإضافة المستخدم كعضو في قسم {department.Name} أو جعله بدون قسم، حتى تتمكن من تعيينه رئيسًا لقسم {department.Name}." });
                     }
                 }
                 _mapper.Map(model, department);
@@ -172,11 +172,11 @@ namespace Agazaty.Controllers
                 var dept = _mapper.Map<DepartmentDTO>(department);
                 var manager = await _accountService.FindById(dept.ManagerId);
                 dept.ManagerName = $"{manager.FirstName} {manager.SecondName} {manager.ThirdName} {manager.ForthName}";
-                return Ok(new { Message = ".تم تحديث القسم بنجاح",Department = dept });
+                return Ok(new { Message = "تم تحديث القسم بنجاح.", Department = dept });
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = ".حدث خطأ أثناء معالجة طلبك", error = ex.Message });
+                return StatusCode(500, new { message = "حدث خطأ أثناء معالجة طلبك.", error = ex.Message });
             }
         }
         //[Authorize(Roles = "مدير الموارد البشرية")]
@@ -185,7 +185,7 @@ namespace Agazaty.Controllers
         {
             if (departmentID <= 0)
             {
-                return BadRequest(new { Message = ".معرّف القسم غير صالح" });
+                return BadRequest(new { Message = "معرّف القسم غير صالح." });
             }
 
             try
@@ -194,20 +194,20 @@ namespace Agazaty.Controllers
 
                 if (department == null)
                 {
-                    return NotFound(".لم يتم العثور على قسم");
+                    return NotFound("لم يتم العثور على قسم.");
                 }
                 var users = await _accountService.GetAllUsersByDepartmentId(departmentID);
                 if (users.Any())
                 {
-                    return BadRequest(new { Message = ".هذا القسم يحتوي على أعضاء، قم بتعديل قسمهم إلى قسم آخر حتى تتمكن من حذف هذا القسم" });
+                    return BadRequest(new { Message = "هذا القسم يحتوي على أعضاء، قم بتعديل قسمهم إلى قسم آخر حتى تتمكن من حذف هذا القسم." });
                 }
                 await _base.Remove(department);
 
-                return Ok(".تم حذف القسم بنجاح");
+                return Ok("تم حذف القسم بنجاح.");
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = ".حدث خطأ أثناء معالجة طلبك", error = ex.Message });
+                return StatusCode(500, new { message = "حدث خطأ أثناء معالجة طلبك.", error = ex.Message });
             }
         }
     }

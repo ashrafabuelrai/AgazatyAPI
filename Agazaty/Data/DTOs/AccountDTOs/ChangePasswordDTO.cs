@@ -4,17 +4,17 @@ namespace Agazaty.Data.DTOs.AccountDTOs
 {
     public class ChangePasswordDTO
     {
-        [Required]
+        [Required(ErrorMessage = "معرف المستخدم مطلوب.")]
         public string UseId {  get; set; }
-        [Required]
+        [Required(ErrorMessage = "كلمة المرور الحالية مطلوبة.")]
         public string CurrentPassword { get; set; }
 
-        [Required]
-        [StringLength(20, MinimumLength = 8, ErrorMessage = ".يجب أن تكون كلمة المرور على الأقل 8 أحرف")]
+        [Required(ErrorMessage = "كلمة المرور الجديدة مطلوبة.")]
+        [StringLength(20, MinimumLength = 8, ErrorMessage = "يجب أن تكون كلمة المرور على الأقل 8 أحرف.")]
         public string NewPassword { get; set; }
 
-        [Required]
-        [Compare("NewPassword", ErrorMessage = ".كلمة المرور غير متطابقة")]
+        [Required(ErrorMessage = "تأكيد كلمة المرور مطلوب.")]
+        [Compare("NewPassword", ErrorMessage = "كلمة المرور غير متطابقة.")]
         public string ConfirmNewPassword { get; set; }
     }
 }

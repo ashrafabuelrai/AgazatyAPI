@@ -38,19 +38,19 @@ namespace Agazaty.Controllers
         public async Task<ActionResult<PermitLeaveDTO>> GetPermitLeaveImageByleaveId(int leaveID)
         {
             if (leaveID <= 0)
-                return BadRequest(new { message = ".معرف التصريح غير صالح" });
+                return BadRequest(new { message = "معرف التصريح غير صالح." });
             try
             {
                 var permitLeaveImage = await _PermitImagebase.Get(c => c.LeaveId == leaveID);
                 if (permitLeaveImage == null)
                 {
-                    return NotFound(new { Message = ".لا توجد صورة للتصريح " });
+                    return NotFound(new { Message = "لا توجد صورة للتصريح." });
                 }
                 return Ok(_mapper.Map<PermitLeaveImageDTO>(permitLeaveImage));
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = ".حدث خطأ أثناء معالجة طلبك", error = ex.Message });
+                return StatusCode(500, new { message = "حدث خطأ أثناء معالجة طلبك.", error = ex.Message });
             }
         }
         //[Authorize]
@@ -60,13 +60,13 @@ namespace Agazaty.Controllers
         public async Task<ActionResult<PermitLeaveDTO>> GetPermitLeaveById(int leaveID)
         {
             if (leaveID <= 0)
-                return BadRequest(new { message = ".معرف التصريح غير صالح" });
+                return BadRequest(new { message = "معرف التصريح غير صالح." });
             try
             {
                 var permitLeave = await _Permitbase.Get(c => c.Id == leaveID);
                 if (permitLeave == null)
                 {
-                    return NotFound(new { Message = ".لم يتم العثور على تصريح" });
+                    return NotFound(new { Message = "لم يتم العثور على تصريح." });
                 }
                 var leave = _mapper.Map<PermitLeaveDTO>(permitLeave);
                 var user = await _accountService.FindById(permitLeave.UserId);
@@ -75,7 +75,7 @@ namespace Agazaty.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = ".حدث خطأ أثناء معالجة طلبك", error = ex.Message });
+                return StatusCode(500, new { message = "حدث خطأ أثناء معالجة طلبك.", error = ex.Message });
             }
         }
         //[Authorize(Roles = "مدير الموارد البشرية")]
@@ -89,7 +89,7 @@ namespace Agazaty.Controllers
                 var permitLeaves = await _Permitbase.GetAll();
                 if (!permitLeaves.Any())
                 {
-                    return NotFound(new { Message = ".لا توجد تصاريح" });
+                    return NotFound(new { Message = "لا توجد تصاريح." });
                 }
 
                 var leaves = _mapper.Map<IEnumerable<PermitLeaveDTO>>(permitLeaves);
@@ -102,7 +102,7 @@ namespace Agazaty.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = ".حدث خطأ أثناء معالجة طلبك", error = ex.Message });
+                return StatusCode(500, new { message = "حدث خطأ أثناء معالجة طلبك.", error = ex.Message });
             }
         }
         //[Authorize]
@@ -112,13 +112,13 @@ namespace Agazaty.Controllers
         public async Task<ActionResult<IEnumerable<PermitLeaveDTO>>> GetAllPermitLeavesByUserID(string userID)
         {
             if (string.IsNullOrWhiteSpace(userID))
-                return BadRequest(new { message = ".معرّف المستخدم غير صالح" });
+                return BadRequest(new { message = "معرّف المستخدم غير صالح." });
             try
             {
                 var permitLeaves = await _Permitbase.GetAll(p => p.UserId == userID);
                 if (!permitLeaves.Any())
                 {
-                    return NotFound(new { Message = ".لا توجد تصاريح" });
+                    return NotFound(new { Message = "لا توجد تصاريح." });
                 }
 
                 var leaves = _mapper.Map<IEnumerable<PermitLeaveDTO>>(permitLeaves);
@@ -131,7 +131,7 @@ namespace Agazaty.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = ".حدث خطأ أثناء معالجة طلبك", error = ex.Message });
+                return StatusCode(500, new { message = "حدث خطأ أثناء معالجة طلبك.", error = ex.Message });
             }
         }
         //[Authorize]
@@ -141,14 +141,14 @@ namespace Agazaty.Controllers
         public async Task<ActionResult<IEnumerable<PermitLeaveDTO>>> GetAllPermitLeavesByUserIDAndMonth(string userID, int month)
         {
             if (string.IsNullOrWhiteSpace(userID) || month < 1 || month > 12)
-                return BadRequest(new { message = "Invalid user ID or month." });
+                return BadRequest(new { message = "معرف المستخدم أو الشهر غير صحيح." });
             try
             {
                 var permitLeaves = await _Permitbase.GetAll(p => p.UserId == userID &&
                                    p.Date.Month == month);
                 if (!permitLeaves.Any())
                 {
-                    return NotFound(new { Message = ".لا توجد تصاريح" });
+                    return NotFound(new { Message = "لا توجد تصاريح." });
                 }
 
                 var leaves = _mapper.Map<IEnumerable<PermitLeaveDTO>>(permitLeaves);
@@ -161,7 +161,7 @@ namespace Agazaty.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = ".حدث خطأ أثناء معالجة طلبك", error = ex.Message });
+                return StatusCode(500, new { message = "حدث خطأ أثناء معالجة طلبك.", error = ex.Message });
             }
         }
         //[Authorize]
@@ -178,7 +178,7 @@ namespace Agazaty.Controllers
                                    p.Date.Year == year);
                 if (!permitLeaves.Any())
                 {
-                    return NotFound(new{ Message = ".لا توجد تصاريح" });
+                    return NotFound(new { Message = "لا توجد تصاريح." });
                 }
 
                 var leaves = _mapper.Map<IEnumerable<PermitLeaveDTO>>(permitLeaves);
@@ -191,7 +191,7 @@ namespace Agazaty.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = ".حدث خطأ أثناء معالجة طلبك", error = ex.Message });
+                return StatusCode(500, new { message = "حدث خطأ أثناء معالجة طلبك.", error = ex.Message });
             }
         }
         //[Authorize(Roles = "مدير الموارد البشرية")]
@@ -206,11 +206,11 @@ namespace Agazaty.Controllers
                 {
                     return BadRequest(ModelState);
                 }
-                
-                if (model.Hours <= 0) return BadRequest(new { Message = ".عدد الساعات يجب أن يكون أكثر من 0" });
-                if (model.Hours > 3) return BadRequest(new { Message = ".عدد الساعات لا يمكن أن  تكون علي الأكثر تلت ساعات" });
 
-                if (await _accountService.FindById(model.UserId) is null) return BadRequest(new { Message = ".المستخدم غير موجود" });
+                if (model.Hours <= 0) return BadRequest(new { Message = "عدد الساعات يجب أن يكون أكثر من 0." });
+                if (model.Hours > 3) return BadRequest(new { Message = "عدد الساعات لا يمكن أن تكون أكثر من ثلاث ساعات." });
+
+                if (await _accountService.FindById(model.UserId) is null) return BadRequest(new { Message = "المستخدم غير موجود." });
 
                 var permitLeave = _mapper.Map<PermitLeave>(model);
 
@@ -252,7 +252,7 @@ namespace Agazaty.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = ".حدث خطأ أثناء معالجة طلبك", error = ex.Message });
+                return StatusCode(500, new { message = "حدث خطأ أثناء معالجة طلبك.", error = ex.Message });
             }
         }
         //[Authorize(Roles = "مدير الموارد البشرية")]
@@ -264,7 +264,7 @@ namespace Agazaty.Controllers
         {
             if (leaveID<=0)
             {
-                return BadRequest(new { Message = ".معرف التصريح غير صالح" });
+                return BadRequest(new { Message = "معرف التصريح غير صالح." });
             }
             try
             {
@@ -272,14 +272,14 @@ namespace Agazaty.Controllers
                 {
                     return BadRequest(ModelState);
                 }
-                if (model.Hours <= 0) return BadRequest(new { Message = ".عدد الساعات يجب أن يكون أكثر من 0" });
-                if (await _accountService.FindById(model.UserId) is null) return BadRequest(new { Message = ".المستخدم غير موجود" });
+                if (model.Hours <= 0) return BadRequest(new { Message = "عدد الساعات يجب أن يكون أكثر من 0." });
+                if (await _accountService.FindById(model.UserId) is null) return BadRequest(new { Message = "المستخدم غير موجود." });
 
 
                 var permitLeave = await _Permitbase.Get(c => c.Id == leaveID);
                 if (permitLeave == null)
                 {
-                    return NotFound(new { Message = ".لا توجد تصاريح" });
+                    return NotFound(new { Message = "لا توجد تصاريح." });
                 }
 
                 _mapper.Map(model, permitLeave);
@@ -321,11 +321,11 @@ namespace Agazaty.Controllers
                 var leave = _mapper.Map<PermitLeaveDTO>(permitLeave);
                 var user = await _accountService.FindById(permitLeave.UserId);
                 leave.UserName = $"{user.FirstName} {user.SecondName} {user.ThirdName} {user.ForthName}";
-                return Ok(new {Message= "تم التحديث بنجاح", PermitLeave = leave });
+                return Ok(new { Message = "تم التحديث بنجاح.", PermitLeave = leave });
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = ".حدث خطأ أثناء معالجة طلبك", error = ex.Message });
+                return StatusCode(500, new { message = "حدث خطأ أثناء معالجة طلبك.", error = ex.Message });
             }
         }
         //[Authorize(Roles = "مدير الموارد البشرية")]
@@ -337,14 +337,14 @@ namespace Agazaty.Controllers
         {
             if (leaveID<=0)
             {
-                return BadRequest(new { Message = ".معرف التصريح غير صحيح"});
+                return BadRequest(new { Message = "معرف التصريح غير صحيح." });
             }
             try
             {
                 var permitLeave = await _Permitbase.Get(c => c.Id == leaveID);
                 if (permitLeave == null)
                 {
-                    return NotFound(new {Message = ".لا يوجد تصريح" });
+                    return NotFound(new { Message = "لا يوجد تصريح." });
                 }
                 string permitLeavePath = @"images\Permitleaves\PermitLeaveUser-" + permitLeave.UserId;
                 string finalPath = Path.Combine(_webHostEnvironment.WebRootPath, permitLeavePath);
@@ -360,11 +360,11 @@ namespace Agazaty.Controllers
                 }
                 await _Permitbase.Remove(permitLeave);
 
-                return Ok(new { Message = ".تم الحذف بنجاح" });
+                return Ok(new { Message = "تم الحذف بنجاح." });
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = ".حدث خطأ أثناء معالجة طلبك", error = ex.Message });
+                return StatusCode(500, new { message = "حدث خطأ أثناء معالجة طلبك.", error = ex.Message });
             }
         }
         //[Authorize(Roles = "مدير الموارد البشرية")]
@@ -374,7 +374,7 @@ namespace Agazaty.Controllers
         public async Task<IActionResult> DeleteImage(int imageId)
         {
             if (imageId <= 0)
-                return BadRequest(new { Message = "معرف الصورة غير صالح" });
+                return BadRequest(new { Message = "معرف الصورة غير صالح." });
             try
             {
                 var imageToBeDeleted = await _PermitImagebase.Get(pi => pi.Id == imageId);
@@ -390,13 +390,13 @@ namespace Agazaty.Controllers
                     }
                     await _PermitImagebase.Remove(imageToBeDeleted);
 
-                    return Ok(new { Message = ".تم الحذف بنجاح" });
+                    return Ok(new { Message = "تم الحذف بنجاح." });
                 }
-                return NotFound(new { Message = ".لا توجد صورة" });
+                return NotFound(new { Message = "لا توجد صورة." });
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = ".حدث خطأ أثناء معالجة طلبك", error = ex.Message });
+                return StatusCode(500, new { message = "حدث خطأ أثناء معالجة طلبك.", error = ex.Message });
             }
         }
     }

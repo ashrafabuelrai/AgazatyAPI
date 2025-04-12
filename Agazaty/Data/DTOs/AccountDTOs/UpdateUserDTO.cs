@@ -24,15 +24,15 @@ namespace Agazaty.Data.DTOs.AccountDTOs
         [Required]
         public string UserName { get; set; }
         [Required]
-        [RegularExpression(@"^\d{14}$", ErrorMessage = ".يجب أن يحتوي حقل الرقم القومي على 14 رقمًا بالضبط، دون مسافات أو أحرف أخرى")]
+        [RegularExpression(@"^\d{14}$", ErrorMessage = "يجب أن يحتوي حقل الرقم القومي على 14 رقمًا بالضبط، دون مسافات أو أحرف أخرى.")]
         public string NationalID { get; set; }
         [Required]
         public DateTime HireDate { get; set; }
-        [Required]
-        [EmailAddress(ErrorMessage = "Invalid email format.")]
+        [Required(ErrorMessage = "البريد الإلكتروني مطلوب.")]
+        [EmailAddress(ErrorMessage = "تنسيق البريد الإلكتروني غير صحيح.")]
         public string Email { get; set; }
         [Required]
-        [RegularExpression(@"^\d{11}$", ErrorMessage = ".يجب أن يحتوي حقل رقم الهاتف على 11 رقماً بالضبط دون مسافات أو رموز أخرى")]
+        [RegularExpression(@"^\d{11}$", ErrorMessage = "يجب أن يحتوي حقل رقم الهاتف على 11 رقماً بالضبط دون مسافات أو رموز أخرى.")]
         public string PhoneNumber { get; set; }
         [Required]
         public string Gender { get; set; }
