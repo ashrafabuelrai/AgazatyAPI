@@ -32,6 +32,7 @@ namespace Agazaty.Data.DTOs.AccountDTOs
         public string? governorate { get; set; }
         public string? State { get; set; }
         public bool Disability { get; set; }
+        public bool IsDirectManager { get; set; }
 
     }
 }

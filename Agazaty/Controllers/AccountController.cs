@@ -102,6 +102,7 @@ namespace Agazaty.Controllers
                 }
 
                 var ReturnedUser = _mapper.Map<UserDTO>(user);
+
                 ReturnedUser.FullName = $"{user.FirstName} {user.SecondName} {user.ThirdName} {user.ForthName}";
                 ReturnedUser.RoleName = await _accountService.GetFirstRole(user);
                 if (user.Departement_ID != null)
@@ -109,6 +110,9 @@ namespace Agazaty.Controllers
                     var dept = await _deptBase.Get(d => d.Id == user.Departement_ID);
                     ReturnedUser.DepartmentName = dept.Name;
                 }
+                var DepartmentManager = await _deptBase.Get(d => d.ManagerId == ReturnedUser.Id);
+                if (DepartmentManager != null) ReturnedUser.IsDirectManager = true;
+                else ReturnedUser.IsDirectManager = false;
                 return Ok(ReturnedUser);
             }
             catch (Exception ex)
@@ -156,6 +160,9 @@ namespace Agazaty.Controllers
                     var dpt = await _deptBase.Get(d => d.Id == user.Departement_ID);
                     ReturnedUser.DepartmentName = dpt.Name;
                 }
+                var DepartmentManager = await _deptBase.Get(d => d.ManagerId == ReturnedUser.Id);
+                if (DepartmentManager != null) ReturnedUser.IsDirectManager = true;
+                else ReturnedUser.IsDirectManager = false;
                 return Ok(ReturnedUser);
             }
             catch (Exception ex)
@@ -183,6 +190,9 @@ namespace Agazaty.Controllers
                         var dpt = await _deptBase.Get(d => d.Id == user.Departement_ID);
                         ReturnedUser.DepartmentName = dpt.Name;
                     }
+                    var DepartmentManager = await _deptBase.Get(d => d.ManagerId == ReturnedUser.Id);
+                    if (DepartmentManager != null) ReturnedUser.IsDirectManager = true;
+                    else ReturnedUser.IsDirectManager = false;
                 }
                 return Ok(ReturnedUsers);
             }
@@ -211,6 +221,9 @@ namespace Agazaty.Controllers
                         var dpt = await _deptBase.Get(d => d.Id == user.Departement_ID);
                         ReturnedUser.DepartmentName = dpt.Name;
                     }
+                    var DepartmentManager = await _deptBase.Get(d => d.ManagerId == ReturnedUser.Id);
+                    if (DepartmentManager != null) ReturnedUser.IsDirectManager = true;
+                    else ReturnedUser.IsDirectManager = false;
                 }
                 return Ok(ReturnedUsers);
             }
@@ -275,6 +288,9 @@ namespace Agazaty.Controllers
                         var dpt = await _deptBase.Get(d => d.Id == user.Departement_ID);
                         ReturnedUser.DepartmentName = dpt.Name;
                     }
+                    var DepartmentManager = await _deptBase.Get(d => d.ManagerId == ReturnedUser.Id);
+                    if (DepartmentManager != null) ReturnedUser.IsDirectManager = true;
+                    else ReturnedUser.IsDirectManager = false;
                 }
                 return Ok(ReturnedUsers);
             }
@@ -327,6 +343,9 @@ namespace Agazaty.Controllers
                                 var dpt = await _deptBase.Get(d => d.Id == user.Departement_ID);
                                 ReturnedUser.DepartmentName = dpt.Name;
                             }
+                            var DepartmentManager = await _deptBase.Get(d => d.ManagerId == ReturnedUser.Id);
+                            if (DepartmentManager != null) ReturnedUser.IsDirectManager = true;
+                            else ReturnedUser.IsDirectManager = false;
                             return CreatedAtAction(nameof(GetUserById), new { userID = user.Id }, ReturnedUser);
                         }
                         return BadRequest(ress.Errors);
@@ -352,12 +371,15 @@ namespace Agazaty.Controllers
                     bool checkPassword = await _accountService.CheckPassword(user, model.Password);
                     if (user is null || !checkPassword)
                     {
-                        return Unauthorized(new { Message = "!اسم المستخدم أو كلمة المرور غير صحيحة" });
+                        return Unauthorized(new { Message = "أسم المستخدم أو كلمة المرور غير صحيحة!" });
                     }
 
                     var res = await _accountService.GetTokenAsync(user);
                     if (res.IsAuthenticated)
                     {
+                        var DepartmentManager = await _deptBase.Get(d => d.ManagerId == res.Id);
+                        if (DepartmentManager != null) res.IsDirectManager = true;
+                        else res.IsDirectManager = false;
                         await _accountService.TransferingUserNormalLeaveCountToNewSection(user);
                         return Ok(res);
                     }
@@ -371,10 +393,10 @@ namespace Agazaty.Controllers
             }
         }
         //[Authorize(Roles = "مدير الموارد البشرية")]
-        [HttpPut("UpdateUser/{userid}/{RoleName}")]
-        public async Task<IActionResult> UdpateUser(string userid, string RoleName, [FromBody]UpdateUserDTO model)
+        [HttpPut("UpdateUser/{userid}")]
+        public async Task<IActionResult> UdpateUser(string userid,[FromBody]UpdateUserDTO model)
         {
-            if (string.IsNullOrWhiteSpace(userid) || string.IsNullOrWhiteSpace(RoleName))
+            if (string.IsNullOrWhiteSpace(userid) || string.IsNullOrWhiteSpace(model.RoleName))
                 return BadRequest(new { message = ".معرف المستخدم أو المنصب غير صحيح" });
 
 
@@ -385,16 +407,16 @@ namespace Agazaty.Controllers
                     var user = await _accountService.FindById(userid);
                     if (user == null) return NotFound(new { Message = ".لم يتم العثور على المستخدم" });
 
-                    if (RoleName == "عميد الكلية" || RoleName == "أمين الكلية" || RoleName == "مدير الموارد البشرية") // ??????????
+                    if (model.RoleName == "عميد الكلية" || model.RoleName == "أمين الكلية" || model.RoleName == "مدير الموارد البشرية") // ??????????
                     {
-                        var list = await _accountService.GetAllUsersInRole(RoleName);
+                        var list = await _accountService.GetAllUsersInRole(model.RoleName);
                         if (list.Any())
                         {
                             var manager = list.FirstOrDefault();
                             if (manager != null)
                             {
                                 if (manager.Id != userid)
-                                    return BadRequest(new { Message = $".يوجد بالفعل مستخدم لديه دور {RoleName}، يجب أن يكون هذا الدور مخصصًا لمستخدم واحد فقط" });                            }
+                                    return BadRequest(new { Message = $".يوجد بالفعل مستخدم لديه دور {model.RoleName}، يجب أن يكون هذا الدور مخصصًا لمستخدم واحد فقط" });                            }
                         }
                     }
                     var u = await _accountService.FindByEmail(model.Email);
@@ -418,7 +440,7 @@ namespace Agazaty.Controllers
                             return BadRequest(new { Message = "!هذا اسم المستخدم مسجل بالفعل" });
                     }
 
-                    if (!await _roleService.IsRoleExisted(RoleName))
+                    if (!await _roleService.IsRoleExisted(model.RoleName))
                         return BadRequest(new { Message = "!منصب غير صالح" });
 
                     if (model.Departement_ID != null)
@@ -457,7 +479,7 @@ namespace Agazaty.Controllers
                         {
                             await _accountService.RemoveUserFromRole(user, role);
                         }
-                        await _accountService.AddUserToRole(user, RoleName);
+                        await _accountService.AddUserToRole(user, model.RoleName);
 
                         var ReturnedUser = _mapper.Map<UserDTO>(user);
                         ReturnedUser.FullName = $"{user.FirstName} {user.SecondName} {user.ThirdName} {user.ForthName}";
@@ -467,6 +489,9 @@ namespace Agazaty.Controllers
                             var dpt = await _deptBase.Get(d => d.Id == user.Departement_ID);
                             if(dpt!=null) ReturnedUser.DepartmentName = dpt.Name;
                         }
+                        var DepartmentManager = await _deptBase.Get(d => d.ManagerId == ReturnedUser.Id);
+                        if (DepartmentManager != null) ReturnedUser.IsDirectManager = true;
+                        else ReturnedUser.IsDirectManager = false;
                         return Ok(new { Message = ".تم التحديث بنجاح", User = ReturnedUser });
                     }
                     return BadRequest(res.Errors);
