@@ -1,6 +1,7 @@
 ﻿using Agazaty.Data.DTOs.AccountDTOs;
 using Agazaty.Data.DTOs.CasualLeaveDTOs;
 using Agazaty.Data.DTOs.DepartmentDTOs;
+using Agazaty.Data.DTOs.HolidayDTOs;
 using Agazaty.Data.DTOs.NormalLeaveDTOs;
 using Agazaty.Data.DTOs.PermitLeavesDTOs;
 using Agazaty.Data.DTOs.RoleDTOs;
@@ -45,6 +46,9 @@ namespace Agazaty
             CreateMap<IdentityRole, CreateRoleDTO>().ReverseMap();
             CreateMap<IdentityRole, UpdateRoleDTO>().ReverseMap();
             CreateMap<IdentityRole, RoleDTO>().ReverseMap();
+
+            CreateMap<Holiday, CreateHolidayDTO>().ReverseMap();
+            CreateMap<Holiday, UpdateHolidayDTO>().ReverseMap();
         }
     }
 }

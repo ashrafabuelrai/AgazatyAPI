@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Data;
 using Dapper;
 using System.Linq;
+using Agazaty.Data.Base;
 
 
 
@@ -13,12 +14,14 @@ namespace Agazaty.Data.Services
     {
         private readonly AppDbContext _context;
         private readonly IDbConnection _dbConnection;
+        private readonly IEntityBaseRepository<Holiday> _baseHoliday;
 
 
-        public LeaveValidationService(AppDbContext context, IDbConnection dbConnection)
+        public LeaveValidationService(AppDbContext context, IDbConnection dbConnection, IEntityBaseRepository<Holiday> baseHoliday)
         {
             _context = context;
             _dbConnection = dbConnection;
+            _baseHoliday = baseHoliday;
         }
 
         public async Task<bool> IsLeaveOverlapping(string userId, DateTime startDate, DateTime endDate, string leaveType)
@@ -113,15 +116,18 @@ namespace Agazaty.Data.Services
                 throw new ArgumentException("تاريخ البداية يجب أن يكون قبل تاريخ النهاية.");
             }
             int leaveDays = 0;
-
+            //var holidays = await _baseHoliday.GetAll(h => h.Date.Year == DateTime.UtcNow.Year);
             for (DateTime date = startDate; date <= endDate; date = date.AddDays(1))
             {
+                var holiday = await _baseHoliday.Get(h => h.Date.Date == date.Date);
+                if (holiday == null) 
+                    leaveDays++;
                 // استبعاد الجمعة والسبت
                 //if (date.DayOfWeek == DayOfWeek.Friday || date.DayOfWeek == DayOfWeek.Saturday)
                 //{
                 //    continue;
                 //}
-                leaveDays++;
+                //leaveDays++;
             }
             return leaveDays;
             //return  Enumerable.Range(0, (endDate - startDate).Days + 1)

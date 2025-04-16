@@ -47,6 +47,7 @@ namespace Agazaty
             builder.Services.AddScoped<IRoleService, RoleService>();
             builder.Services.AddScoped<IEmailService, EmailService>();
             builder.Services.AddScoped<ILeaveValidationService, LeaveValidationService>();
+            builder.Services.AddScoped<IEntityBaseRepository<Holiday>, EntityBaseRepository<Holiday>>();
             builder.Services.AddTransient<IDbConnection>(sp =>
               new SqlConnection(builder.Configuration.GetConnectionString("DefaultConnection")));
 

@@ -30,5 +30,6 @@ namespace Agazaty.Models
         public DbSet<Department> Departments { get; set; }
         public DbSet<SickLeave> SickLeaves { get; set; }
         public DbSet<NormalLeave> NormalLeaves { get; set; }
+        public DbSet<Holiday> Holidays { get; set; }
     }
 }

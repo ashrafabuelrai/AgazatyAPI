@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.DotNet.Scaffolding.Shared.Messaging;
+using OfficeOpenXml;
 using System.ComponentModel.DataAnnotations;
 using System.Data;
 using System.Security.Claims;
@@ -25,15 +26,17 @@ namespace Agazaty.Controllers
         private readonly IAccountService _accountService;
         private readonly IRoleService _roleService;
         private readonly SignInManager<ApplicationUser> _signInManager;
+        private readonly UserManager<ApplicationUser> _userManager;
         private readonly IEntityBaseRepository<Department> _deptBase;
         private readonly IMapper _mapper;
-        public AccountController(IMapper mapper, IAccountService accountService, SignInManager<ApplicationUser> signInManager, IRoleService roleService, IEntityBaseRepository<Department> deptBase)
+        public AccountController(IMapper mapper, IAccountService accountService, SignInManager<ApplicationUser> signInManager, IRoleService roleService, IEntityBaseRepository<Department> deptBase, UserManager<ApplicationUser> userManager)
         {
             _accountService = accountService;
             _signInManager = signInManager;
             _roleService = roleService;
             _deptBase = deptBase;
             _mapper = mapper;
+            _userManager = userManager;
         }
         
         //[Authorize]
@@ -298,7 +301,419 @@ namespace Agazaty.Controllers
             {
                 return StatusCode(500, new { message = "حدث خطأ أثناء معالجة طلبك.", error = ex.Message });
             }
-        }        
+        }
+        //[HttpPost("upload-users-excel")]
+        //public async Task<IActionResult> UploadUsersExcel(IFormFile file)
+        //{
+        //    // 1. Validate File
+        //    if (file == null || file.Length == 0)
+        //        return BadRequest("No file uploaded.");
+
+        //    if (!Path.GetExtension(file.FileName).Equals(".xlsx", StringComparison.OrdinalIgnoreCase))
+        //        return BadRequest("Only .xlsx files are allowed.");
+
+        //    var results = new List<string>();
+        //    var validationErrors = new List<string>();
+
+        //    using var stream = new MemoryStream();
+        //    await file.CopyToAsync(stream);
+
+        //    // 2. Set EPPlus LicenseContext (critical for EPPlus 5+)
+        //    ExcelPackage.LicenseContext = LicenseContext.NonCommercial; // or Commercial
+
+        //    using var package = new ExcelPackage(stream);
+        //    ExcelWorksheet worksheet = package.Workbook.Worksheets[0];
+        //    int rowCount = worksheet.Dimension?.Rows ?? 0;
+
+        //    if (rowCount < 2)
+        //        return BadRequest("Excel file has no data rows.");
+
+        //    // 3. Process Each Row
+        //    for (int row = 2; row <= rowCount; row++)
+        //    {
+        //        try
+        //        {
+        //            // 4. Parse and Validate Data
+        //            if (!DateTime.TryParse(worksheet.Cells[row, 9].Text, out var dateOfBirth))
+        //            {
+        //                results.Add($"Row {row}: تاريخ الميلاد غير صالح.");
+        //                continue;
+        //            }
+
+        //            if (!DateTime.TryParse(worksheet.Cells[row, 11].Text, out var hireDate))
+        //            {
+        //                results.Add($"Row {row}: تاريخ التعيين غير صالح.");
+        //                continue;
+        //            }
+
+        //            var dto = new CreateUserDTO
+        //            {
+        //                UserName = worksheet.Cells[row, 1].Text?.Trim(),
+        //                PhoneNumber = worksheet.Cells[row, 2].Text?.Trim(),
+        //                Email = worksheet.Cells[row, 3].Text?.Trim(),
+        //                Password = worksheet.Cells[row, 4].Text?.Trim(),
+        //                FirstName = worksheet.Cells[row, 5].Text?.Trim(),
+        //                SecondName = worksheet.Cells[row, 6].Text?.Trim(),
+        //                ThirdName = worksheet.Cells[row, 7].Text?.Trim(),
+        //                ForthName = worksheet.Cells[row, 8].Text?.Trim(),
+        //                DateOfBirth = dateOfBirth,
+        //                Gender = worksheet.Cells[row, 10].Text?.Trim(),
+        //                HireDate = hireDate,
+        //                NationalID = worksheet.Cells[row, 12].Text?.Trim(),
+        //                position = int.TryParse(worksheet.Cells[row, 13].Text, out var pos) ? pos : 0,
+        //                Departement_ID = string.IsNullOrWhiteSpace(worksheet.Cells[row, 14].Text)
+        //                    ? null
+        //                    : int.TryParse(worksheet.Cells[row, 14].Text, out var dept) ? dept : null,
+        //                Disability = worksheet.Cells[row, 15].Text?.Trim() == "نعم",
+        //                Street = worksheet.Cells[row, 16].Text?.Trim(),
+        //                governorate = worksheet.Cells[row, 17].Text?.Trim(),
+        //                State = worksheet.Cells[row, 18].Text?.Trim(),
+        //                NormalLeavesCount = int.TryParse(worksheet.Cells[row, 19].Text, out var normal) ? normal : 0,
+        //                CasualLeavesCount = int.TryParse(worksheet.Cells[row, 20].Text, out var casual) ? casual : 0,
+        //                NonChronicSickLeavesCount = int.TryParse(worksheet.Cells[row, 21].Text, out var sick) ? sick : 0,
+        //                NormalLeavesCount_47 = int.TryParse(worksheet.Cells[row, 22].Text, out var n47) ? n47 : 0,
+        //                NormalLeavesCount_81Before3Years = int.TryParse(worksheet.Cells[row, 23].Text, out var n81_3) ? n81_3 : 0,
+        //                NormalLeavesCount_81Before2Years = int.TryParse(worksheet.Cells[row, 24].Text, out var n81_2) ? n81_2 : 0,
+        //                NormalLeavesCount_81Before1Years = int.TryParse(worksheet.Cells[row, 25].Text, out var n81_1) ? n81_1 : 0,
+        //                HowManyDaysFrom81And47 = int.TryParse(worksheet.Cells[row, 26].Text, out var totalDays) ? totalDays : 0
+        //            };
+
+        //            // 5. Validate DTO (using DataAnnotations)
+        //            var validationContext = new System.ComponentModel.DataAnnotations.ValidationContext(dto);
+        //            var validationResults = new List<ValidationResult>();
+        //            bool isValid = Validator.TryValidateObject(dto, validationContext, validationResults, true);
+
+        //            if (!isValid)
+        //            {
+        //                var errorMessages = validationResults.Select(v => v.ErrorMessage);
+        //                results.Add($"Row {row}: خطأ في التحقق - {string.Join(" | ", errorMessages)}");
+        //                continue;
+        //            }
+        //            // 6. Map DTO to ApplicationUser (manual mapping)
+        //            var user = new ApplicationUser
+        //            {
+        //                UserName = dto.UserName,
+        //                Email = dto.Email,
+        //                PhoneNumber = dto.PhoneNumber,
+        //                FirstName = dto.FirstName,
+        //                SecondName = dto.SecondName,
+        //                ThirdName = dto.ThirdName,
+        //                ForthName = dto.ForthName,
+        //                DateOfBirth = dto.DateOfBirth,
+        //                Gender = dto.Gender,
+        //                HireDate = dto.HireDate,
+        //                NationalID = dto.NationalID,
+        //                position = dto.position,
+        //                Departement_ID = dto.Departement_ID,
+        //                Disability = dto.Disability,
+        //                Street = dto.Street,
+        //                Governorate = dto.governorate,
+        //                State = dto.State,
+        //                NormalLeavesCount = dto.NormalLeavesCount,
+        //                CasualLeavesCount = dto.CasualLeavesCount,
+        //                NonChronicSickLeavesCount = dto.NonChronicSickLeavesCount,
+        //                NormalLeavesCount_47 = dto.NormalLeavesCount_47,
+        //                NormalLeavesCount_81Before3Years = dto.NormalLeavesCount_81Before3Years,
+        //                NormalLeavesCount_81Before2Years = dto.NormalLeavesCount_81Before2Years,
+        //                NormalLeavesCount_81Before1Years = dto.NormalLeavesCount_81Before1Years,
+        //                HowManyDaysFrom81And47 = dto.HowManyDaysFrom81And47,
+        //            };
+
+        //            // 7. Create User
+        //            var createResult = await _userManager.CreateAsync(user, dto.Password);
+
+        //            if (!createResult.Succeeded)
+        //            {
+        //                var errors = createResult.Errors.Select(e => e.Description);
+        //                results.Add($"Row {row}: فشل إنشاء المستخدم - {string.Join(" | ", errors)}");
+        //                continue;
+        //            }
+
+        //            results.Add($"Row {row}: تم إنشاء المستخدم بنجاح.");
+        //        }
+        //        catch (Exception ex)
+        //        {
+        //            results.Add($"Row {row}: خطأ غير متوقع - {ex.Message}");
+        //        }
+        //    }
+
+        //    // 8. Return Structured Response
+        //    var successCount = results.Count(r => r.Contains("نجاح"));
+        //    var errorCount = results.Count - successCount;
+
+        //    return Ok(new
+        //    {
+        //        TotalRowsProcessed = rowCount - 1,
+        //        SuccessCount = successCount,
+        //        ErrorCount = errorCount,
+        //        Results = results
+        //    });
+        //}
+        [HttpPost("upload-users-excel")]
+        public async Task<IActionResult> UploadUsersExcel(IFormFile file)
+        {
+            // 1. Validate File
+            if (file == null || file.Length == 0)
+                return BadRequest("No file uploaded.");
+
+            if (!Path.GetExtension(file.FileName).Equals(".xlsx", StringComparison.OrdinalIgnoreCase))
+                return BadRequest("Only .xlsx files are allowed.");
+
+            var results = new List<string>();
+            var validationErrors = new List<string>();
+
+            using var stream = new MemoryStream();
+            await file.CopyToAsync(stream);
+
+            // 2. Set EPPlus LicenseContext
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+
+            using var package = new ExcelPackage(stream);
+            ExcelWorksheet worksheet = package.Workbook.Worksheets[0];
+            int rowCount = worksheet.Dimension?.Rows ?? 0;
+
+            if (rowCount < 2)
+                return BadRequest("Excel file has no data rows.");
+
+            // Define column indexes (adjust these numbers based on your actual Excel structure)
+            const int UserNameCol = 1;
+            const int PhoneNumberCol = 2;
+            const int EmailCol = 3;
+            const int PasswordCol = 4;
+            const int FirstNameCol = 5;
+            const int SecondNameCol = 6;
+            const int ThirdNameCol = 7;
+            const int ForthNameCol = 8;
+            const int DateOfBirthCol = 9;
+            const int GenderCol = 10;
+            const int HireDateCol = 11;
+            const int NationalIDCol = 12;
+            const int PositionCol = 13;
+            const int DepartmentCol = 14;
+            const int DisabilityCol = 15;
+            const int StreetCol = 16;
+            const int GovernorateCol = 17;
+            const int StateCol = 18;
+            const int NormalLeavesCol = 19;
+            const int CasualLeavesCol = 20;
+            const int SickLeavesCol = 21;
+            const int Leaves47Col = 22;
+            const int Leaves81_3Col = 23;
+            const int Leaves81_2Col = 24;
+            const int Leaves81_1Col = 25;
+            const int TotalDaysCol = 26;
+            const int RoleNameCol = 27; // Column for role name (not part of DTO)
+
+            // 3. Process Each Row
+            for (int row = 2; row <= rowCount; row++)
+            {
+                try
+                {
+                    // 4. Parse and Validate Data
+                    if (!DateTime.TryParse(worksheet.Cells[row, DateOfBirthCol].Text, out var dateOfBirth))
+                    {
+                        results.Add($"Row {row}: تاريخ الميلاد غير صالح.");
+                        continue;
+                    }
+
+                    if (!DateTime.TryParse(worksheet.Cells[row, HireDateCol].Text, out var hireDate))
+                    {
+                        results.Add($"Row {row}: تاريخ التعيين غير صالح.");
+                        continue;
+                    }
+                    bool Disability = false;
+                    var disabilityValue = worksheet.Cells[row, DisabilityCol].Value;
+
+                    if (disabilityValue != null)
+                    {
+                        if (disabilityValue is string strValue)
+                        {
+                            Disability = strValue.Trim() == "1";
+                        }
+                        else if (disabilityValue is int intValue)
+                        {
+                            Disability = intValue == 1;
+                        }
+                        else if (double.TryParse(disabilityValue.ToString(), out double doubleValue))
+                        {
+                            Disability = doubleValue == 1;
+                        }
+                    }
+
+                    // Get role name from Excel (not part of DTO validation)
+                    var roleName = worksheet.Cells[row, RoleNameCol].Text?.Trim();
+
+                    var dto = new CreateUserDTO
+                    {
+                        UserName = worksheet.Cells[row, UserNameCol].Text?.Trim(),
+                        PhoneNumber = worksheet.Cells[row, PhoneNumberCol].Text?.Trim(),
+                        Email = worksheet.Cells[row, EmailCol].Text?.Trim(),
+                        Password = worksheet.Cells[row, PasswordCol].Text?.Trim(),
+                        FirstName = worksheet.Cells[row, FirstNameCol].Text?.Trim(),
+                        SecondName = worksheet.Cells[row, SecondNameCol].Text?.Trim(),
+                        ThirdName = worksheet.Cells[row, ThirdNameCol].Text?.Trim(),
+                        ForthName = worksheet.Cells[row, ForthNameCol].Text?.Trim(),
+                        DateOfBirth = dateOfBirth,
+                        Gender = worksheet.Cells[row, GenderCol].Text?.Trim(),
+                        HireDate = hireDate,
+                        NationalID = worksheet.Cells[row, NationalIDCol].Text?.Trim(),
+                        position = int.TryParse(worksheet.Cells[row, PositionCol].Text, out var pos) ? pos : 0,
+                        Departement_ID = string.IsNullOrWhiteSpace(worksheet.Cells[row, DepartmentCol].Text)
+                            ? null
+                            : int.TryParse(worksheet.Cells[row, DepartmentCol].Text, out var dept) ? dept : null,
+                        Disability = Disability,
+                        //Disability = worksheet.Cells[row, DisabilityCol].Text?.Trim() == "نعم",
+                        Street = worksheet.Cells[row, StreetCol].Text?.Trim(),
+                        governorate = worksheet.Cells[row, GovernorateCol].Text?.Trim(),
+                        State = worksheet.Cells[row, StateCol].Text?.Trim(),
+                        NormalLeavesCount = int.TryParse(worksheet.Cells[row, NormalLeavesCol].Text, out var normal) ? normal : 0,
+                        CasualLeavesCount = int.TryParse(worksheet.Cells[row, CasualLeavesCol].Text, out var casual) ? casual : 0,
+                        NonChronicSickLeavesCount = int.TryParse(worksheet.Cells[row, SickLeavesCol].Text, out var sick) ? sick : 0,
+                        NormalLeavesCount_47 = int.TryParse(worksheet.Cells[row, Leaves47Col].Text, out var n47) ? n47 : 0,
+                        NormalLeavesCount_81Before3Years = int.TryParse(worksheet.Cells[row, Leaves81_3Col].Text, out var n81_3) ? n81_3 : 0,
+                        NormalLeavesCount_81Before2Years = int.TryParse(worksheet.Cells[row, Leaves81_2Col].Text, out var n81_2) ? n81_2 : 0,
+                        NormalLeavesCount_81Before1Years = int.TryParse(worksheet.Cells[row, Leaves81_1Col].Text, out var n81_1) ? n81_1 : 0,
+                        HowManyDaysFrom81And47 = int.TryParse(worksheet.Cells[row, TotalDaysCol].Text, out var totalDays) ? totalDays : 0
+                    };
+
+                    // 5. Validate DTO (without role name)
+                    var validationContext = new System.ComponentModel.DataAnnotations.ValidationContext(dto);
+                    var validationResults = new List<ValidationResult>();
+                    bool isValid = Validator.TryValidateObject(dto, validationContext, validationResults, true);
+
+                    if (!isValid)
+                    {
+                        var errorMessages = validationResults.Select(v => v.ErrorMessage);
+                        results.Add($"Row {row}: خطأ في التحقق - {string.Join(" | ", errorMessages)}");
+                        continue;
+                    }
+
+                    // 6. Map DTO to ApplicationUser
+                    var user = new ApplicationUser
+                    {
+                        UserName = dto.UserName,
+                        Email = dto.Email,
+                        PhoneNumber = dto.PhoneNumber,
+                        FirstName = dto.FirstName,
+                        SecondName = dto.SecondName,
+                        ThirdName = dto.ThirdName,
+                        ForthName = dto.ForthName,
+                        DateOfBirth = dto.DateOfBirth,
+                        Gender = dto.Gender,
+                        HireDate = dto.HireDate,
+                        NationalID = dto.NationalID,
+                        position = dto.position,
+                        Departement_ID = dto.Departement_ID,
+                        Disability = dto.Disability,
+                        Street = dto.Street,
+                        Governorate = dto.governorate,
+                        State = dto.State,
+                        NormalLeavesCount = dto.NormalLeavesCount,
+                        CasualLeavesCount = dto.CasualLeavesCount,
+                        NonChronicSickLeavesCount = dto.NonChronicSickLeavesCount,
+                        NormalLeavesCount_47 = dto.NormalLeavesCount_47,
+                        NormalLeavesCount_81Before3Years = dto.NormalLeavesCount_81Before3Years,
+                        NormalLeavesCount_81Before2Years = dto.NormalLeavesCount_81Before2Years,
+                        NormalLeavesCount_81Before1Years = dto.NormalLeavesCount_81Before1Years,
+                        HowManyDaysFrom81And47 = dto.HowManyDaysFrom81And47,
+                    };
+
+                    // 7. Create User
+                    user.Active = true;
+                    var init = user.HireDate;
+                    var today = DateTime.UtcNow;
+                    user.YearsOfWork = today.Year - init.Year;
+                    if (init.Month < 7)
+                    {
+                        user.YearsOfWork++;
+                    }
+                    if (today.Month < 7)
+                    {
+                        user.YearsOfWork--;
+                    }
+                    if (user.Disability == true)
+                    {
+                        user.LeaveSection = NormalLeaveSection.DisabilityEmployee;
+                    }
+                    else
+                    {
+                        //var hireDuration = (DateTime.UtcNow.Date - user.HireDate).TotalDays;
+                        // validation on leaves count from front
+                        var ageInYears = DateTime.UtcNow.Year - user.DateOfBirth.Year;
+                        if (DateTime.UtcNow.Month < user.DateOfBirth.Month ||
+                           (DateTime.UtcNow.Month == user.DateOfBirth.Month && DateTime.UtcNow.Day < user.DateOfBirth.Day))
+                        {
+                            ageInYears--;
+                        }
+                        if (ageInYears >= 50) user.LeaveSection = NormalLeaveSection.FiftyAge;
+                        else
+                        {
+                            if (user.YearsOfWork == 0) user.LeaveSection = NormalLeaveSection.NoSection;
+                            if (user.YearsOfWork >= 1) user.LeaveSection = NormalLeaveSection.OneYear;
+                            if (user.YearsOfWork >= 10) user.LeaveSection = NormalLeaveSection.TenYears;
+                        }
+                    }
+                    var createResult = await _userManager.CreateAsync(user, dto.Password);
+
+
+                    if (!createResult.Succeeded)
+                    {
+                        var errors = createResult.Errors.Select(e => e.Description);
+                        results.Add($"Row {row}: فشل إنشاء المستخدم - {string.Join(" | ", errors)}");
+                        continue;
+                    }
+
+                    // 8. Assign Role if specified (handled separately from DTO)
+                    if (!string.IsNullOrWhiteSpace(roleName))
+                    {
+                        try
+                        {
+                            var roleExists = await _roleService.IsRoleExisted(roleName);
+                            if (!roleExists)
+                            {
+                                results.Add($"Row {row}: تم إنشاء المستخدم بنجاح ولكن الدور '{roleName}' غير موجود.");
+                                continue;
+                            }
+
+                            var addToRoleResult = await _userManager.AddToRoleAsync(user, roleName);
+                            if (!addToRoleResult.Succeeded)
+                            {
+                                var roleErrors = addToRoleResult.Errors.Select(e => e.Description);
+                                results.Add($"Row {row}: تم إنشاء المستخدم بنجاح ولكن فشل تعيين الدور - {string.Join(" | ", roleErrors)}");
+                                continue;
+                            }
+
+                            results.Add($"Row {row}: تم إنشاء المستخدم وتعيين الدور '{roleName}' بنجاح.");
+                        }
+                        catch (Exception roleEx)
+                        {
+                            results.Add($"Row {row}: تم إنشاء المستخدم بنجاح ولكن حدث خطأ أثناء تعيين الدور - {roleEx.Message}");
+                        }
+                    }
+                    else
+                    {
+                        results.Add($"Row {row}: تم إنشاء المستخدم بنجاح (بدون تعيين دور).");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    results.Add($"Row {row}: خطأ غير متوقع - {ex.Message}");
+                }
+            }
+
+            // 9. Return Structured Response
+            var successCount = results.Count(r => r.Contains("تم إنشاء المستخدم بنجاح"));
+            var errorCount = results.Count - successCount;
+
+            return Ok(new
+            {
+                TotalRowsProcessed = rowCount - 1,
+                SuccessCount = successCount,
+                ErrorCount = errorCount,
+                Results = results
+            });
+        }
+
         //[Authorize(Roles = "مدير الموارد البشرية")]
         [HttpPost("CreateUser/{RoleName}")]
         public async Task<IActionResult> CreateUser([FromRoute]string RoleName, [FromBody] CreateUserDTO model) 

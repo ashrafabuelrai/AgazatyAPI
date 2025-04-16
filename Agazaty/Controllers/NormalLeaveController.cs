@@ -41,7 +41,7 @@ namespace Agazaty.Controllers
             _leaveValidationService = leaveValidationService;
         }
         //private static Dictionary<int, List<DateTime>> officialHolidaysByYear = new Dictionary<int, List<DateTime>>();
-        // ✅ 1. إدخال الإجازات الرسمية لسنة معينة من الـ HR
+        // //✅ 1. إدخال الإجازات الرسمية لسنة معينة من الـ HR
         //[HttpPost("add-holidays/{year}")]
         //public IActionResult AddOfficialHolidays(int year, [FromBody] List<DateTime> holidays)
         //{
@@ -53,7 +53,7 @@ namespace Agazaty.Controllers
         //    officialHolidaysByYear[year].AddRange(holidays);
         //    return Ok(new { message = $"تمت إضافة الإجازات الرسمية لسنة {year} بنجاح!", holidays });
         //}
-        // ✅ 2. عرض الإجازات الرسمية لسنة معينة
+        //// ✅ 2. عرض الإجازات الرسمية لسنة معينة
         //[HttpGet("holidays/{year}")]
         //public IActionResult GetOfficialHolidays(int year)
         //{
@@ -658,8 +658,6 @@ namespace Agazaty.Controllers
                 {
                     return BadRequest(new { message = "فترة الإجازة التي طلبتها تتداخل مع فترة إجازة معتمدة موجودة." });
                 }
-
-
                 user.TakenNormalLeavesCount = 0;
                 user.TakenNormalLeavesCount_47 = 0;
                 user.TakenNormalLeavesCount_81Before1Years = 0;
@@ -667,10 +665,41 @@ namespace Agazaty.Controllers
                 user.TakenNormalLeavesCount_81Before3Years = 0;
 
                 //validation on year
-                if (model.EndDate <= today)
+                if (model.StartDate.Date == DateTime.UtcNow.Date) { 
+                DateTime currentTime = DateTime.UtcNow; // Or use request timestamp
+                var UserRole = await _accountService.GetFirstRole(user);
+
+                    if (UserRole == "موظف")
+                    {
+                        if (user.position == 1)
+                        {
+
+                            // Define cutoff time (8:30 AM)
+                            TimeSpan cutoffTime = new TimeSpan(8, 30, 0); // 8:30 AM
+
+                            if (currentTime.TimeOfDay > cutoffTime)
+                            {
+                                // Reject if current time is 8:30 AM or later
+                                return BadRequest(new { message = "Administrative staff can only submit requests before or equal 8:30 AM." });
+                            }
+                        }
+                        else
+                        {
+                            // Define cutoff time (7:30 AM)
+                            TimeSpan cutoffTime = new TimeSpan(7, 30, 0); // 7:30 AM
+
+                            if (currentTime.TimeOfDay > cutoffTime)
+                            {
+                                // Reject if current time is 7:30 AM or later
+                                return BadRequest(new { message = "Nonadministrative staff can only submit requests before or equal 7:30 AM." });
+                            }
+                        }
+                    }
+                }
+                if (model.EndDate < today)
                     errors.Add("تاريخ النهاية لا يمكن أن يكون في الماضي، الرجاء اختيار تاريخ مستقبلي.");
 
-                if (model.StartDate <= today)
+                if (model.StartDate < today)
                     errors.Add("تاريخ البدء لا يمكن أن يكون في الماضي، الرجاء اختيار تاريخ مستقبلي.");
 
                 if (model.StartDate > model.EndDate)
@@ -982,7 +1011,8 @@ namespace Agazaty.Controllers
 
                 if (model.GeneralManagerDecision == true)
                 {
-                    int LeaveDays=await _leaveValidationService.CalculateLeaveDays(NormalLeave.StartDate, NormalLeave.EndDate);
+                    //int LeaveDays=await _leaveValidationService.CalculateLeaveDays(NormalLeave.StartDate, NormalLeave.EndDate);
+                    int LeaveDays = NormalLeave.Days;
                     NormalLeave.Accepted = true;
                     if (LeaveDays > user.NormalLeavesCount)
                     {                       

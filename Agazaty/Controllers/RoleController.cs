@@ -1,4 +1,5 @@
-﻿using Agazaty.Data.DTOs.AccountDTOs;
+﻿using Agazaty.Data.Base;
+using Agazaty.Data.DTOs.AccountDTOs;
 using Agazaty.Data.DTOs.DepartmentDTOs;
 using Agazaty.Data.DTOs.PermitLeavesDTOs;
 using Agazaty.Data.DTOs.RoleDTOs;
@@ -20,12 +21,14 @@ namespace Agazaty.Controllers
         private readonly IRoleService _roleService;
         private readonly IAccountService _accountService;
         private readonly IMapper _mapper;
-       
-        public RoleController(IRoleService roleService, IMapper mapper, IAccountService accountService)
+        private readonly IEntityBaseRepository<Department> _deptBase;
+
+        public RoleController(IRoleService roleService, IMapper mapper, IAccountService accountService, IEntityBaseRepository<Department> deptBase)
         {
             _roleService = roleService;
             _mapper = mapper;
             _accountService = accountService;
+            _deptBase = deptBase;
         }
         //[Authorize(Roles = "مدير الموارد البشرية")]
         [HttpGet("GetRoleByID/{roleId}")]
@@ -48,11 +51,25 @@ namespace Agazaty.Controllers
         [HttpGet("GetAllUsersInRole/{RoleName}")]
         public async Task<IActionResult> GetAllUsersInRoles(string RoleName)
         {
+            if (!await _roleService.IsRoleExisted(RoleName))
+                return BadRequest(new { Message = "Invalid Role!" });
             try
             {
                 var users = await _accountService.GetAllUsersInRole(RoleName);
                 if (users.Count() == 0) return NotFound(new { Message = "لم يتم العثور على مستخدمين في هذا المنصب." });
-                return Ok(_mapper.Map<IEnumerable<UserDTO>>(users)); 
+                var ReturnedUsers = _mapper.Map<IEnumerable<UserDTO>>(users);
+                foreach (var ReturnedUser in ReturnedUsers)
+                {
+                    var user = await _accountService.FindById(ReturnedUser.Id);
+                    ReturnedUser.FullName = $"{user.FirstName} {user.SecondName} {user.ThirdName} {user.ForthName}";
+                    ReturnedUser.RoleName= RoleName;
+                    if (user.Departement_ID != null)
+                    {
+                        var dpt = await _deptBase.Get(d => d.Id == user.Departement_ID);
+                        ReturnedUser.DepartmentName = dpt.Name;
+                    }
+                }
+                return Ok(ReturnedUsers); 
             }
             catch (Exception ex)
             {
