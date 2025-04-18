@@ -92,12 +92,16 @@ namespace Agazaty.Controllers
                 var AllNormalLeaves = await _normalLeavebase.GetAll(l => l.StartDate.Year == holiday.Date.Year);
                 foreach (var leave in AllNormalLeaves)
                 {
-                    if (leave.StartDate >= model.Date && leave.EndDate <= model.Date)
+                    if (leave.StartDate.Date >= model.Date.Date && leave.EndDate.Date <= model.Date.Date)
                     {
                         var user = await _accountService.FindById(leave.UserID);
                         user.NormalLeavesCount++;
+                        --leave.Days;
+                        await _normalLeavebase.Update(leave);
+                        await _accountService.Update(user);
                     }
                 }
+
                 return CreatedAtAction(nameof(GetHolidayById), new { holidayID = holiday.Id }, holiday);
             }
             catch (Exception ex)
@@ -135,10 +139,14 @@ namespace Agazaty.Controllers
                     var AllNormalLeaves1 = await _normalLeavebase.GetAll(l => l.StartDate.Year == holiday.Date.Year);
                     foreach (var leave in AllNormalLeaves1)
                     {
-                        if (leave.StartDate >= holiday.Date && leave.EndDate <= holiday.Date)
+                        if (leave.StartDate.Date >= holiday.Date && leave.EndDate.Date <= holiday.Date)
                         {
                             var user = await _accountService.FindById(leave.UserID);
                             user.NormalLeavesCount--;
+                            ++leave.Days;
+                            await _normalLeavebase.Update(leave);
+                            await _accountService.Update(user);
+
                         }
                     }
                 }
@@ -148,10 +156,13 @@ namespace Agazaty.Controllers
                 var AllNormalLeaves = await _normalLeavebase.GetAll(l => l.StartDate.Year == holiday.Date.Year);  // new date
                 foreach (var leave in AllNormalLeaves)
                 {
-                    if (leave.StartDate >= holiday.Date && leave.EndDate <= holiday.Date)
+                    if (leave.StartDate.Date >= holiday.Date && leave.EndDate.Date <= holiday.Date)
                     {
                         var user = await _accountService.FindById(leave.UserID);
                         user.NormalLeavesCount++;
+                        --leave.Days;
+                        await _normalLeavebase.Update(leave);
+                        await _accountService.Update(user);
                     }
                 }
 
