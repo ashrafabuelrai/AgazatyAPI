@@ -110,6 +110,13 @@ namespace Agazaty.Data.Services.Implementation
                 coworkers.Append(dean);
                 return coworkers;
             }
+            else if (role == "مدير الموارد البشرية")
+            {
+                var coworkers  = (await GetAllUsersInRole("موظف")).Where(u => u.position == 1 && u.Active == true);
+                var supervisor = (await GetAllUsersInRole("أمين الكلية")).Where(u => u.Active == true).FirstOrDefault();
+                coworkers.Append(supervisor);
+                return coworkers;
+            }
             else
             {
                 var coworkers = (await GetAllUsersInRole(role)).Where(u => u.position <= user.position && u.Active == true);
