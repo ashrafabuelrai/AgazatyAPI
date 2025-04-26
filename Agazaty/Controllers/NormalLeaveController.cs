@@ -603,13 +603,13 @@ namespace Agazaty.Controllers
         {
             try
             {
-                if (model == null)
-                {
-                    return BadRequest(new { message = "بيانات الإجازة الاعتيادية غير صالحة." });
-                }
                 if (!ModelState.IsValid)
                 {
                     return BadRequest(ModelState);
+                }
+                if (model == null)
+                {
+                    return BadRequest(new { message = "بيانات الإجازة الاعتيادية غير صالحة." });
                 }
                 // Check if the user already has a pending leave request
                 bool hasPendingLeave = _appDbContext.NormalLeaves
@@ -724,10 +724,40 @@ namespace Agazaty.Controllers
                     var Dean = res.FirstOrDefault();
                     if (Dean == null) { return BadRequest(new { Message = "لا يوجد مستخدم لديه دور العميد." }); }
                     normalLeave.General_ManagerID = Dean.Id;
+                    // >>>>>>>>>>>>>>>>>>>>>>>>>>>  add this
+                    var IsManagerOfDepartment = await _departmentBase.Get(d => d.ManagerId == user.Id);
+                    if (IsManagerOfDepartment != null)
+                    {
+                        normalLeave.Direct_ManagerID = Dean.Id;
+                    }
+                    else
+                    {
+                        //if (DepartmentofUser == null) { return BadRequest(new { Message = "This user doesn't have a department, so user doesn't have a direct manager." }); }
+                        if (user.Departement_ID == null) normalLeave.Direct_ManagerID = Dean.Id;
+                        else
+                        {
+                            var DepartmentofUser = await _departmentBase.Get(dm => dm.Id == user.Departement_ID);
+                            if (DepartmentofUser == null)
+                            {
+                                normalLeave.Direct_ManagerID = Dean.Id;
+                            }
+                            else if (DepartmentofUser.ManagerId == null)  // القسم ليس له رئيس
+                            {
+                                normalLeave.Direct_ManagerID = Dean.Id;
+                            }
+                            else
+                            {
+                                var manager = await _accountService.FindById(DepartmentofUser.ManagerId);
+                                if (manager == null) normalLeave.Direct_ManagerID = Dean.Id;
+                                else normalLeave.Direct_ManagerID = DepartmentofUser.ManagerId;
+                            }
+                        }
+                    }
+                    // >>>>>>>>>>>>>>>>>>>>>>>>>>>
 
-                    var DepartmentofUser = await _departmentBase.Get(dm => dm.Id == user.Departement_ID);
-                    if (DepartmentofUser == null) { return BadRequest(new { Message = "هذا المستخدم ليس لديه قسم، لذلك ليس لديه مدير مباشر." }); }
-                    normalLeave.Direct_ManagerID = DepartmentofUser.ManagerId;
+                    //var DepartmentofUser = await _departmentBase.Get(dm => dm.Id == user.Departement_ID);
+                    //if (DepartmentofUser == null) { return BadRequest(new { Message = "هذا المستخدم ليس لديه قسم، لذلك ليس لديه مدير مباشر." }); }
+                    //normalLeave.Direct_ManagerID = DepartmentofUser.ManagerId;
                 }
                 else if (await _accountService.IsInRoleAsync(user, "موظف"))
                 {
@@ -735,10 +765,40 @@ namespace Agazaty.Controllers
                     var Supervisor = res.FirstOrDefault();
                     if (Supervisor == null) { return BadRequest(new { Message = "لا يوجد مستخدم لديه دور أمين كلية." }); }
                     normalLeave.General_ManagerID = Supervisor.Id;
+                    // >>>>>>>>>>>>>>>>>>>>>>>>>>>  add this
+                    var IsManagerOfDepartment = await _departmentBase.Get(d => d.ManagerId == user.Id);
+                    if (IsManagerOfDepartment != null)
+                    {
+                        normalLeave.Direct_ManagerID = Supervisor.Id;
+                    }
+                    else
+                    {
+                        //if (DepartmentofUser == null) { return BadRequest(new { Message = "This user doesn't have a department, so user doesn't have a direct manager." }); }
+                        if (user.Departement_ID == null) normalLeave.Direct_ManagerID = Supervisor.Id;
+                        else
+                        {
+                            var DepartmentofUser = await _departmentBase.Get(dm => dm.Id == user.Departement_ID);
+                            if (DepartmentofUser == null)
+                            {
+                                normalLeave.Direct_ManagerID = Supervisor.Id;
+                            }
+                            else if (DepartmentofUser.ManagerId == null)  // القسم ليس له رئيس
+                            {
+                                normalLeave.Direct_ManagerID = Supervisor.Id;
+                            }
+                            else
+                            {
+                                var manager = await _accountService.FindById(DepartmentofUser.ManagerId);
+                                if (manager == null) normalLeave.Direct_ManagerID = Supervisor.Id;
+                                else normalLeave.Direct_ManagerID = DepartmentofUser.ManagerId;
+                            }
+                        }
+                    }
+                    // >>>>>>>>>>>>>>>>>>>>>>>>>>>
 
-                    var DepartmentofUser = await _departmentBase.Get(dm => dm.Id == user.Departement_ID);
-                    if (DepartmentofUser == null) { return BadRequest(new { Message = "هذا المستخدم ليس لديه قسم، لذلك ليس لديه مدير مباشر." }); }
-                    normalLeave.Direct_ManagerID = DepartmentofUser.ManagerId;
+                    //var DepartmentofUser = await _departmentBase.Get(dm => dm.Id == user.Departement_ID);
+                    //if (DepartmentofUser == null) { return BadRequest(new { Message = "هذا المستخدم ليس لديه قسم، لذلك ليس لديه مدير مباشر." }); }
+                    //normalLeave.Direct_ManagerID = DepartmentofUser.ManagerId;
                 }
                 else if (await _accountService.IsInRoleAsync(user, "أمين الكلية"))
                 {
@@ -1243,7 +1303,9 @@ namespace Agazaty.Controllers
                 {
                     NormalLeave.Holder = Holder.DirectManager;
 
-
+                    // >>>>>>>>>>>>>>>>>>>>>>>>>>>  add this
+                    if (NormalLeave.Direct_ManagerID == NormalLeave.General_ManagerID) NormalLeave.DirectManager_Decision = true;
+                    // >>>>>>>>>>>>>>>>>>>>>>>>>>>
                     // if Head of Departement made a leave request
                     // if أمين الكلية made a leave request
                     var userr = await _accountService.FindById(NormalLeave.UserID);

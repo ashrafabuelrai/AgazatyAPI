@@ -84,18 +84,23 @@ namespace Agazaty.Controllers
 
             try
             {
-                if (model == null)
-                {
-                    return BadRequest("بيانات القسم غير صالحة.");
-                }
                 if (!ModelState.IsValid)
                 {
                     return BadRequest(ModelState);
+                }
+                if (model == null)
+                {
+                    return BadRequest("بيانات القسم غير صالحة.");
                 }
                 var res = await _accountService.FindById(model.ManagerId);
                 if (res == null)
                 {
                     return NotFound(new { Message = "معرّف المستخدم غير موجود." });
+                }
+                var UserRole = await _accountService.GetFirstRole(res);
+                if (UserRole == "عميد الكلية" || UserRole == "أمين الكلية")
+                {
+                    return BadRequest(new { Message = "لا يمكن ان يكون عميد الكلية او أمين الكلية رؤساء لاقسام" });
                 }
                 // to check : is user whose id is equal model.managerid exists in another department ?
                 var IsExistsInAnotherDepartment = await _base.Get(d => d.Id == res.Departement_ID);
@@ -143,7 +148,11 @@ namespace Agazaty.Controllers
                 {
                     return NotFound(new { Message = "معرّف المستخدم غير موجود." });
                 }
-
+                var UserRole = await _accountService.GetFirstRole(res);
+                if (UserRole == "عميد الكلية" || UserRole == "أمين الكلية")
+                {
+                    return BadRequest(new { Message = "لا يمكن ان يكون عميد الكلية او أمين الكلية رؤساء لاقسام" });
+                }
                 var department = await _base.Get(d => d.Id == departmentID);
                 if (department == null)
                 {

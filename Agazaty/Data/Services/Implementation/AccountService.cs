@@ -98,28 +98,69 @@ namespace Agazaty.Data.Services.Implementation
             var role = (await GetAllRolesOfUser(user)).FirstOrDefault();
             if (role == "عميد الكلية")
             {
-                var coworkers = await GetAllUsersInRole("هيئة تدريس");
-                var supervisor = (await GetAllUsersInRole("أمين الكلية")).Where(u => u.Active == true).FirstOrDefault();
-                coworkers.Append(supervisor);
-                return coworkers;
+                var coworkers = (await GetAllUsersInRole("هيئة تدريس"))
+                 .Where(u => u.position == 2 && u.Active == true && u.Id!= user.Id);
+
+                var supervisor = (await GetAllUsersInRole("أمين الكلية"))
+                                .Where(u => u.Active == true && u.Id != user.Id)
+                                .FirstOrDefault();
+                // هنا خزنا نتيجة الـ Append
+                var allUsers = coworkers.Append(supervisor); // supervisor حتى لو null هيتضاف
+
+                return allUsers;
             }
             else if (role == "أمين الكلية")
             {
-                var coworkers = await GetAllUsersInRole("موظف");
-                var dean = (await GetAllUsersInRole("عميد الكلية")).Where(u => u.Active == true).FirstOrDefault();
-                coworkers.Append(dean);
-                return coworkers;
+                var coworkers = (await GetAllUsersInRole("موظف"))
+                .Where(u => u.position == 2 && u.Active == true && u.Id != user.Id);
+
+                var supervisor = (await GetAllUsersInRole("عميد الكلية"))
+                                .Where(u => u.Active == true && u.Id != user.Id)
+                                .FirstOrDefault();
+
+                // هنا خزنا نتيجة الـ Append
+                var allUsers = coworkers.Append(supervisor); // supervisor حتى لو null هيتضاف
+
+                return allUsers;
             }
             else if (role == "مدير الموارد البشرية")
             {
-                var coworkers  = (await GetAllUsersInRole("موظف")).Where(u => u.position == 1 && u.Active == true);
-                var supervisor = (await GetAllUsersInRole("أمين الكلية")).Where(u => u.Active == true).FirstOrDefault();
-                coworkers.Append(supervisor);
-                return coworkers;
+                var coworkers = (await GetAllUsersInRole("موظف"))
+                .Where(u => u.position == 2 && u.Active == true && u.Id != user.Id);
+
+                var supervisor = (await GetAllUsersInRole("أمين الكلية"))
+                                .Where(u => u.Active == true && u.Id != user.Id)
+                                .FirstOrDefault();
+
+                // هنا خزنا نتيجة الـ Append
+                var allUsers = coworkers.Append(supervisor); // supervisor حتى لو null هيتضاف
+
+                return allUsers;
+
             }
             else
             {
-                var coworkers = (await GetAllUsersInRole(role)).Where(u => u.position <= user.position && u.Active == true);
+                var coworkers = (await GetAllUsersInRole(role)).Where(u => u.position <= user.position && u.Active == true && u.Id != user.Id);
+                if (role == "هيئة تدريس")
+                {
+                    var supervisor = (await GetAllUsersInRole("عميد الكلية"))
+                               .Where(u => u.Active == true && u.Id != user.Id)
+                               .FirstOrDefault();
+                    var allUsers = coworkers.Append(supervisor); // supervisor حتى لو null هيتضاف
+                    return allUsers;
+                }
+                else if (role == "موظف")
+                {
+                    var supervisor = (await GetAllUsersInRole("أمين الكلية"))
+                                .Where(u => u.Active == true && u.Id != user.Id)
+                                .FirstOrDefault();
+                    var HR = (await GetAllUsersInRole("مدير الموارد البشرية"))
+                                .Where(u => u.Active == true && u.Id != user.Id)
+                                .FirstOrDefault();
+                    var allUsers = coworkers.Append(supervisor); // supervisor حتى لو null هيتضاف
+                    allUsers = coworkers.Append(HR); // supervisor حتى لو null هيتضاف
+                    return allUsers;
+                }
                 return coworkers;
             }
         }

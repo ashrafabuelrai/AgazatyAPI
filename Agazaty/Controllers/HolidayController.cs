@@ -88,15 +88,17 @@ namespace Agazaty.Controllers
 
                 var holiday = _mapper.Map<Holiday>(model);
                 await _base.Add(holiday);
-
-                var AllNormalLeaves = await _normalLeavebase.GetAll(l => l.StartDate.Year == holiday.Date.Year);
+                //اخر تلت شهور
+                //var AllNormalLeaves = await _normalLeavebase.GetAll(l => l.StartDate.Year == holiday.Date.Year);
+                var threeMonthsAgo = holiday.Date.AddMonths(-3);
+                var AllNormalLeaves = await _normalLeavebase.GetAll(l => l.StartDate >= threeMonthsAgo);
                 foreach (var leave in AllNormalLeaves)
                 {
-                    if (leave.StartDate.Date >= model.Date.Date && leave.EndDate.Date <= model.Date.Date)
+                    if (leave.StartDate.Date <= model.Date.Date && leave.EndDate.Date >= model.Date.Date)
                     {
                         var user = await _accountService.FindById(leave.UserID);
                         user.NormalLeavesCount++;
-                        --leave.Days;
+                        leave.Days--;
                         await _normalLeavebase.Update(leave);
                         await _accountService.Update(user);
                     }
@@ -117,6 +119,13 @@ namespace Agazaty.Controllers
             {           
                 return BadRequest(new { Message = "Invalid holiday data." });
             }
+            var OldHoliday = await _base.Get(h => h.Id == holidayID);
+            if (OldHoliday.Date.Date == model.Date.Date)
+            {
+                _mapper.Map(model, OldHoliday);
+                await _base.Update(OldHoliday);
+                return Ok(new { Message = $"Holiday has been successfully updated.", Holiday = OldHoliday });
+            }
             var sameholiday = await _base.Get(h => h.Date.Date == model.Date.Date);
             if (sameholiday != null)
             {
@@ -136,31 +145,36 @@ namespace Agazaty.Controllers
                 }
                 else // old date wrong
                 {
-                    var AllNormalLeaves1 = await _normalLeavebase.GetAll(l => l.StartDate.Year == holiday.Date.Year);
-                    foreach (var leave in AllNormalLeaves1)
+                    //اخر تلت شهور
+                    //var AllNormalLeaves1 = await _normalLeavebase.GetAll(l => l.StartDate.Year == holiday.Date.Year);
+                    var threeMonthsAgo2 = holiday.Date.AddMonths(-3);
+                    var AllNormalLeaves = await _normalLeavebase.GetAll(l => l.StartDate >= threeMonthsAgo2);
+                    foreach (var leave in AllNormalLeaves)
                     {
-                        if (leave.StartDate.Date >= holiday.Date && leave.EndDate.Date <= holiday.Date)
+                        if (leave.StartDate.Date <= holiday.Date.Date && leave.EndDate.Date >= holiday.Date.Date)
                         {
                             var user = await _accountService.FindById(leave.UserID);
                             user.NormalLeavesCount--;
-                            ++leave.Days;
+                            leave.Days++;
                             await _normalLeavebase.Update(leave);
                             await _accountService.Update(user);
-
                         }
                     }
                 }
                 _mapper.Map(model, holiday);
                 await _base.Update(holiday);
 
-                var AllNormalLeaves = await _normalLeavebase.GetAll(l => l.StartDate.Year == holiday.Date.Year);  // new date
-                foreach (var leave in AllNormalLeaves)
+                //أخر تلت شهور
+                //var AllNormalLeaves = await _normalLeavebase.GetAll(l => l.StartDate.Year == holiday.Date.Year);  // new date
+                var threeMonthsAgo3 = model.Date.AddMonths(-3);
+                var AllNormalLeaves1 = await _normalLeavebase.GetAll(l => l.StartDate >= threeMonthsAgo3);
+                foreach (var leave in AllNormalLeaves1)
                 {
-                    if (leave.StartDate.Date >= holiday.Date && leave.EndDate.Date <= holiday.Date)
+                    if (leave.StartDate.Date <= model.Date.Date && leave.EndDate.Date >= model.Date.Date)
                     {
                         var user = await _accountService.FindById(leave.UserID);
                         user.NormalLeavesCount++;
-                        --leave.Days;
+                        leave.Days--;
                         await _normalLeavebase.Update(leave);
                         await _accountService.Update(user);
                     }
@@ -192,10 +206,12 @@ namespace Agazaty.Controllers
                 }
                 await _base.Remove(holiday);
 
-                var AllNormalLeaves = await _normalLeavebase.GetAll(l => l.StartDate.Year == holiday.Date.Year);
+                //var AllNormalLeaves = await _normalLeavebase.GetAll(l => l.StartDate.Year == holiday.Date.Year);
+                var threeMonthsAgo3 = holiday.Date.AddMonths(-3);
+                var AllNormalLeaves = await _normalLeavebase.GetAll(l => l.StartDate >= threeMonthsAgo3);
                 foreach (var leave in AllNormalLeaves)
                 {
-                    if (leave.StartDate >= holiday.Date && leave.EndDate <= holiday.Date)
+                    if (leave.StartDate.Date <= holiday.Date.Date && leave.EndDate.Date >= holiday.Date.Date)
                     {
                         var user = await _accountService.FindById(leave.UserID);
                         user.NormalLeavesCount--;

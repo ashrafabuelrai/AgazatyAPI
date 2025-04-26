@@ -206,7 +206,11 @@ namespace Agazaty.Controllers
                 {
                     return BadRequest(ModelState);
                 }
-
+                var PermitleavesOfUsers = await _Permitbase.GetAll(p=>p.UserId==model.UserId);
+                if (PermitleavesOfUsers.Any(p=>p.Date.Date==model.Date.Date))
+                {
+                    return BadRequest(new { Message = "الحد الاقصي تصريح واحد يوميا" });
+                }
                 if (model.Hours <= 0) return BadRequest(new { Message = "عدد الساعات يجب أن يكون أكثر من 0." });
                 if (model.Hours > 3) return BadRequest(new { Message = "عدد الساعات لا يمكن أن تكون أكثر من ثلاث ساعات." });
 
