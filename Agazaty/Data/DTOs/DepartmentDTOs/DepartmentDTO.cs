@@ -8,5 +8,6 @@
         public DateTime CreateDate { get; set; }
         public string ManagerId { get; set; }
         public string ManagerName { get; set; }
+        public bool DepartmentType { get; set; }
     }
 }

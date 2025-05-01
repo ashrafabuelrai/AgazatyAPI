@@ -14,6 +14,7 @@ namespace Agazaty.Data.DTOs.AccountDTOs
         public string? FullName { get; set; }
         public string? RoleName { get; set; }
         public string? DepartmentName { get; set; }
+        public DateTime DateOfBirth { get; set; }
         public int NonChronicSickLeavesCount { get; set; }
         public int NormalLeavesCount { get; set; }
         public int CasualLeavesCount { get; set; }
@@ -34,6 +35,6 @@ namespace Agazaty.Data.DTOs.AccountDTOs
         public bool Disability { get; set; }
         public bool IsDirectManager { get; set; }
         public string Gender { get; set; }
-
+        public int position { get; set; }
     }
 }

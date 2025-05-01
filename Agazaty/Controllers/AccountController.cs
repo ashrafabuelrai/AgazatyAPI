@@ -95,7 +95,7 @@ namespace Agazaty.Controllers
             }
             return Ok("تم تغيير كلمة المرور بنجاح.");
         }
-        //[Authorize]
+        [Authorize]
         [HttpGet("GetUserById/{userID}")]
         public async Task<IActionResult> GetUserById([FromRoute]string userID)
         {
@@ -178,7 +178,7 @@ namespace Agazaty.Controllers
                 return StatusCode(500, new { message = "حدث خطأ أثناء معالجة طلبك.", error = ex.Message });
             }
         }
-        //[Authorize(Roles = "عميد الكلية,أمين الكلية,مدير الموارد البشرية")]
+        [Authorize(Roles = "عميد الكلية,أمين الكلية,مدير الموارد البشرية")]
         [HttpGet("GetAllActiveUsers")]
         public async Task<IActionResult> GetAllActiveUsers()
         {
@@ -2097,7 +2097,7 @@ namespace Agazaty.Controllers
         //            new { Message = "An unexpected error occurred", Error = ex.Message });
         //    }
         //}
-        //[Authorize(Roles = "مدير الموارد البشرية")]
+        [Authorize(Roles = "مدير الموارد البشرية")]
         [HttpPost("CreateUser/{RoleName}")]
         public async Task<IActionResult> CreateUser([FromRoute]string RoleName, [FromBody] CreateUserDTO model) 
         {

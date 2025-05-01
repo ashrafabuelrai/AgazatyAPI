@@ -1,4 +1,5 @@
 ﻿using Agazaty.Data.Base;
+using Agazaty.Data.DTOs.AccountDTOs;
 using Agazaty.Data.DTOs.CasualLeaveDTOs;
 using Agazaty.Data.DTOs.DepartmentDTOs;
 using Agazaty.Data.Services.Interfaces;
@@ -50,6 +51,7 @@ namespace Agazaty.Controllers
                 return StatusCode(500, new { message = "حدث خطأ أثناء معالجة طلبك.", error = ex.Message });
             }
         }
+        
         //[Authorize(Roles = "مدير الموارد البشرية")]
         [HttpGet("GetDepartmentById/{departmentID:int}")]
         public async Task<IActionResult> GetDepartmentById(int departmentID)
@@ -77,6 +79,63 @@ namespace Agazaty.Controllers
                 return StatusCode(500, new { message = "حدث خطأ أثناء معالجة طلبك.", error = ex.Message });
             }
         }
+        //[Authorize(Roles = "مدير الموارد البشرية")]
+        [HttpGet("GetAllAvailableForDeptCreation/{roleName}")]
+        public async Task<IActionResult> GetAllAvailableForDeptCreation(string roleName)
+        {
+            try
+            {
+                var users = await _accountService.GetAllUsersInRole(roleName);
+                if (roleName == "هيئة تدريس")
+                {
+                    var supervisor = (await _accountService.GetAllUsersInRole("عميد الكلية"))
+                               .Where(u => u.Active == true)
+                               .FirstOrDefault();
+                    var allUsers = users.Append(supervisor); // supervisor حتى لو null هيتضاف
+                    var ReturnedUsers = _mapper.Map<IEnumerable<UserDTO>>(allUsers);
+                    foreach (var ReturnedUser in ReturnedUsers)
+                    {
+                        var user = await _accountService.FindById(ReturnedUser.Id);
+                        ReturnedUser.FullName = $"{user.FirstName} {user.SecondName} {user.ThirdName} {user.ForthName}";
+                        ReturnedUser.RoleName = await _accountService.GetFirstRole(user);
+                    }
+                    return Ok(ReturnedUsers);
+                }
+                else if (roleName == "موظف")
+                {
+                    var supervisor = (await _accountService.GetAllUsersInRole("أمين الكلية"))
+                                .Where(u => u.Active == true )
+                                .FirstOrDefault();
+                    var HR = (await _accountService.GetAllUsersInRole("مدير الموارد البشرية"))
+                                .Where(u => u.Active == true )
+                                .FirstOrDefault();
+                    var allUsers = users.Append(supervisor); // supervisor حتى لو null هيتضاف
+                    allUsers = users.Append(HR); // supervisor حتى لو null هيتضاف
+                    var ReturnedUsers = _mapper.Map<IEnumerable<UserDTO>>(allUsers);
+                    foreach (var ReturnedUser in ReturnedUsers)
+                    {
+                        var user = await _accountService.FindById(ReturnedUser.Id);
+                        ReturnedUser.FullName = $"{user.FirstName} {user.SecondName} {user.ThirdName} {user.ForthName}";
+                        ReturnedUser.RoleName = await _accountService.GetFirstRole(user);
+                    }
+
+                    return Ok(ReturnedUsers);
+                }
+                var ReturnedUserss = _mapper.Map<IEnumerable<UserDTO>>(users);
+                foreach (var ReturnedUser in ReturnedUserss)
+                {
+                    var user = await _accountService.FindById(ReturnedUser.Id);
+                    ReturnedUser.FullName = $"{user.FirstName} {user.SecondName} {user.ThirdName} {user.ForthName}";
+                    ReturnedUser.RoleName = await _accountService.GetFirstRole(user);
+                }
+                return Ok(ReturnedUserss);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "حدث خطأ أثناء معالجة طلبك.", error = ex.Message });
+            }
+        }
+
         //[Authorize(Roles = "مدير الموارد البشرية")]
         [HttpPost("CreateDepartment")]
         public async Task<IActionResult> CreateDepartment([FromBody]CreateDepartmentDTO model)

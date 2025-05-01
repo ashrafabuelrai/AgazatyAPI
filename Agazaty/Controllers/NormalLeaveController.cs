@@ -238,7 +238,6 @@ namespace Agazaty.Controllers
                 return BadRequest(new { message = "معرف المستخدم غير صالح." });
             try
             {
-
                 var NormalLeaves = await _base.GetAll(n => n.UserID == userID);
                 if (!NormalLeaves.Any())
                 {
@@ -1304,16 +1303,20 @@ namespace Agazaty.Controllers
                     NormalLeave.Holder = Holder.DirectManager;
 
                     // >>>>>>>>>>>>>>>>>>>>>>>>>>>  add this
-                    if (NormalLeave.Direct_ManagerID == NormalLeave.General_ManagerID) NormalLeave.DirectManager_Decision = true;
+                    if (NormalLeave.Direct_ManagerID == NormalLeave.General_ManagerID)
+                    {
+                        NormalLeave.DirectManager_Decision = true;
+                        NormalLeave.Holder = Holder.GeneralManager;
+                    }
                     // >>>>>>>>>>>>>>>>>>>>>>>>>>>
                     // if Head of Departement made a leave request
                     // if أمين الكلية made a leave request
-                    var userr = await _accountService.FindById(NormalLeave.UserID);
-                    var IsdeptManager = await _departmentBase.Get(d => d.ManagerId == userr.Id);
-                    bool cheackRole = await _accountService.IsInRoleAsync(userr, "أمين الكلية");
-                    bool cheackRoleHr = await _accountService.IsInRoleAsync(userr, "مدير الموارد البشرية");
-                    if (cheackRole || IsdeptManager != null || cheackRoleHr)
-                        NormalLeave.DirectManager_Decision = true;
+                    //var userr = await _accountService.FindById(NormalLeave.UserID);
+                    //var IsdeptManager = await _departmentBase.Get(d => d.ManagerId == userr.Id);
+                    //bool cheackRole = await _accountService.IsInRoleAsync(userr, "أمين الكلية");
+                    //bool cheackRoleHr = await _accountService.IsInRoleAsync(userr, "مدير الموارد البشرية");
+                    //if (cheackRole || IsdeptManager != null || cheackRoleHr)
+                    //    NormalLeave.DirectManager_Decision = true;
                 }
                 await _base.Update(NormalLeave);
 
