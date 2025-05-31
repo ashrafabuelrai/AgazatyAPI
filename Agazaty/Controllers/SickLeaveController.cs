@@ -1,10 +1,10 @@
-﻿using Agazaty.Data.Base;
-using Agazaty.Data.DTOs.CasualLeaveDTOs;
-using Agazaty.Data.DTOs.RoleDTOs;
-using Agazaty.Data.DTOs.SickLeaveDTOs;
-using Agazaty.Data.Services;
-using Agazaty.Data.Services.Interfaces;
-using Agazaty.Models;
+﻿
+using Agazaty.Application.Common.DTOs.SickLeaveDTOs;
+
+using Agazaty.Application.Services.Interfaces;
+using Agazaty.Domain.Entities;
+using Agazaty.Domain.Repositories;
+using Agazaty.Infrastructure.Data;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -12,7 +12,7 @@ using Microsoft.AspNetCore.Mvc;
 using Org.BouncyCastle.Asn1.Ocsp;
 using System.Data;
 using System.Net;
-using static Agazaty.Data.Enums.LeaveTypes;
+
 
 namespace Agazaty.Controllers
 {

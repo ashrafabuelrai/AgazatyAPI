@@ -1,19 +1,27 @@
-using Agazaty.Data.Base;
-using Agazaty.Data.Services.Implementation;
-using Agazaty.Data.Services.Interfaces;
-using Agazaty.Models;
+
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using AutoMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using Agazaty.Data.Email;
-using Agazaty.Data.Services.AutomaticInitializationService;
-using Agazaty.Data.Services;
-using System.Data;
-using System.Data.Common;
+
 using Microsoft.Data.SqlClient;
+
+using Agazaty.Application.Services.Implementation;
+
+using Agazaty.Application.Services.AutomaticInitializationService;
+using Agazaty.Application.Services.Interfaces;
+using Agazaty.Data.Services.Implementation;
+using System.Data;
+using Agazaty.Domain.Entities;
+using Agazaty.Infrastructure.Data;
+using Agazaty.Infrastructure.Repository;
+using Agazaty.Infrastructure.Services.Email;
+using Agazaty.Domain.Repositories;
+using Agazaty.Shared.Contracts.Email.Service;
+using Agazaty.Application.Settings;
+
 
 namespace Agazaty
 {

@@ -1,12 +1,13 @@
-﻿using Agazaty.Data.DTOs.AccountDTOs;
-using Agazaty.Data.DTOs.CasualLeaveDTOs;
-using Agazaty.Data.DTOs.DepartmentDTOs;
-using Agazaty.Data.DTOs.HolidayDTOs;
-using Agazaty.Data.DTOs.NormalLeaveDTOs;
-using Agazaty.Data.DTOs.PermitLeavesDTOs;
-using Agazaty.Data.DTOs.RoleDTOs;
-using Agazaty.Data.DTOs.SickLeaveDTOs;
-using Agazaty.Models;
+﻿
+using Agazaty.Application.Common.DTOs.AccountDTOs;
+using Agazaty.Application.Common.DTOs.CasualLeaveDTOs;
+using Agazaty.Application.Common.DTOs.DepartmentDTOs;
+using Agazaty.Application.Common.DTOs.HolidayDTOs;
+using Agazaty.Application.Common.DTOs.NormalLeaveDTOs;
+using Agazaty.Application.Common.DTOs.PermitLeavesDTOs;
+using Agazaty.Application.Common.DTOs.RoleDTOs;
+using Agazaty.Application.Common.DTOs.SickLeaveDTOs;
+using Agazaty.Domain.Entities;
 using AutoMapper;
 using Microsoft.AspNetCore.Identity;
 

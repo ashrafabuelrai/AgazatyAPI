@@ -1,21 +1,31 @@
-﻿using Agazaty.Data.Base;
-using Agazaty.Data.DTOs.CasualLeaveDTOs;
-using Agazaty.Data.DTOs.NormalLeaveDTOs;
-using Agazaty.Data.Email;
-using Agazaty.Data.Enums;
-using Agazaty.Data.Services.Interfaces;
-using Agazaty.Models;
+﻿
+
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using NormalLeaveTask.Models;
+
 using System.Data;
 using static System.Net.WebRequestMethods;
 using System.Security.Principal;
 using System.Runtime.InteropServices;
-using Agazaty.Data.DTOs.AccountDTOs;
+
+
+using Agazaty.Domain.Entities;
+
+using Agazaty.Infrastructure.Data;
+using Agazaty.Application.Services.Interfaces;
+
+using Agazaty.Application.Common.DTOs.NormalLeaveDTOs;
+using static Agazaty.Shared.Utility.SD;
+using Agazaty.Application.Common.DTOs.AccountDTOs;
+
+using Agazaty.Shared.Utility;
+using Agazaty.Infrastructure.Repository;
+using Agazaty.Domain.Repositories;
+using Agazaty.Shared.Contracts.Email.DTOs;
+using Agazaty.Shared.Contracts.Email.Service;
 
 namespace Agazaty.Controllers
 {
@@ -23,7 +33,7 @@ namespace Agazaty.Controllers
     [ApiController]
     public class NormalLeaveController : ControllerBase
     {
-        private readonly IEntityBaseRepository<NormalLeave> _base;
+        private readonly EntityBaseRepository<NormalLeave> _base;
         private readonly IAccountService _accountService;
         private readonly IEntityBaseRepository<Department> _departmentBase;
         private readonly IMapper _mapper;
@@ -32,7 +42,7 @@ namespace Agazaty.Controllers
         private readonly ILeaveValidationService _leaveValidationService;
         public NormalLeaveController(AppDbContext appDbContext, IEntityBaseRepository<NormalLeave> Ebase, IAccountService accountService, IMapper mapper, IEntityBaseRepository<Department> departmentBase, IEmailService EmailService, ILeaveValidationService leaveValidationService)
         {
-            _base = Ebase;
+            _base = (EntityBaseRepository<NormalLeave>?)Ebase;
             _accountService = accountService;
             _mapper = mapper;
             _appDbContext = appDbContext;
@@ -560,6 +570,7 @@ namespace Agazaty.Controllers
         [HttpGet("GetLeaveTypes")]
         public async Task<IActionResult> GetLeaveTypes()
         {
+
             return Ok(LeaveTypes.res);
         }
         //[Authorize(Roles = "عميد الكلية,أمين الكلية,مدير الموارد البشرية")]

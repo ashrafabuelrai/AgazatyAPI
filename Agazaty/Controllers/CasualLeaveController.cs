@@ -1,8 +1,11 @@
-﻿using Agazaty.Data.Base;
-using Agazaty.Data.DTOs.CasualLeaveDTOs;
-using Agazaty.Data.Services;
-using Agazaty.Data.Services.Interfaces;
-using Agazaty.Models;
+﻿
+using Agazaty.Application.Common.DTOs.CasualLeaveDTOs;
+
+using Agazaty.Application.Services.Interfaces;
+
+using Agazaty.Domain.Entities;
+using Agazaty.Domain.Repositories;
+using Agazaty.Infrastructure.Repository;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -16,14 +19,14 @@ namespace Agazaty.Controllers
     [ApiController]
     public class CasualLeaveController : ControllerBase
     {
-        private readonly IEntityBaseRepository<CasualLeave> _base;
+        private readonly EntityBaseRepository<CasualLeave> _base;
         private readonly IAccountService _accountService;
         private readonly IMapper _mapper;
         private readonly ILeaveValidationService _leaveValidationService;
         public CasualLeaveController(IMapper mapper, IEntityBaseRepository<CasualLeave> Ebase, IAccountService accountService, ILeaveValidationService leaveValidationService)
         {
             _mapper = mapper;
-            _base = Ebase;
+            _base = (EntityBaseRepository<CasualLeave>?)Ebase;
             _accountService = accountService;
             _leaveValidationService = leaveValidationService;
         }

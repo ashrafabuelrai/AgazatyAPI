@@ -1,10 +1,10 @@
-﻿using Agazaty.Data.Base;
-using Agazaty.Data.DTOs.AccountDTOs;
-using Agazaty.Data.DTOs.DepartmentDTOs;
-using Agazaty.Data.DTOs.PermitLeavesDTOs;
-using Agazaty.Data.DTOs.RoleDTOs;
-using Agazaty.Data.Services.Interfaces;
-using Agazaty.Models;
+﻿
+using Agazaty.Application.Common.DTOs.AccountDTOs;
+using Agazaty.Application.Common.DTOs.RoleDTOs;
+
+using Agazaty.Application.Services.Interfaces;
+using Agazaty.Domain.Entities;
+using Agazaty.Domain.Repositories;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;

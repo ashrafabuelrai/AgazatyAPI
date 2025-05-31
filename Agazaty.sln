@@ -3,7 +3,15 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.3.32929.385
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Agazaty", "Agazaty\Agazaty.csproj", "{8A9B380E-E17A-4B88-9488-E550EC6383CB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Agazaty.Presentation", "Agazaty\Agazaty.Presentation.csproj", "{8A9B380E-E17A-4B88-9488-E550EC6383CB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Agazaty.Domain", "Agazaty.Domain\Agazaty.Domain.csproj", "{9D486A19-01A3-47B5-AA22-DAC5F1779DFA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Agazaty.Application", "Agazaty.Application\Agazaty.Application.csproj", "{24338E01-8D4A-40BC-8690-9DDDBDFA0AB3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Agazaty.Infrastructure", "Agazaty.Infrastructure\Agazaty.Infrastructure.csproj", "{135DDD89-2635-486D-84DB-4F485AC258B4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Agazaty.Shared", "Agazaty.Shared\Agazaty.Shared.csproj", "{63275BE2-E670-4D0E-B61E-95119FC37321}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +23,22 @@ Global
 		{8A9B380E-E17A-4B88-9488-E550EC6383CB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8A9B380E-E17A-4B88-9488-E550EC6383CB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8A9B380E-E17A-4B88-9488-E550EC6383CB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9D486A19-01A3-47B5-AA22-DAC5F1779DFA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9D486A19-01A3-47B5-AA22-DAC5F1779DFA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9D486A19-01A3-47B5-AA22-DAC5F1779DFA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9D486A19-01A3-47B5-AA22-DAC5F1779DFA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{24338E01-8D4A-40BC-8690-9DDDBDFA0AB3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{24338E01-8D4A-40BC-8690-9DDDBDFA0AB3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{24338E01-8D4A-40BC-8690-9DDDBDFA0AB3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{24338E01-8D4A-40BC-8690-9DDDBDFA0AB3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{135DDD89-2635-486D-84DB-4F485AC258B4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{135DDD89-2635-486D-84DB-4F485AC258B4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{135DDD89-2635-486D-84DB-4F485AC258B4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{135DDD89-2635-486D-84DB-4F485AC258B4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{63275BE2-E670-4D0E-B61E-95119FC37321}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{63275BE2-E670-4D0E-B61E-95119FC37321}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{63275BE2-E670-4D0E-B61E-95119FC37321}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{63275BE2-E670-4D0E-B61E-95119FC37321}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,9 +1,10 @@
-﻿using Agazaty.Data.Base;
-using Agazaty.Data.DTOs.AccountDTOs;
-using Agazaty.Data.Email.DTOs;
-using Agazaty.Data.Enums;
-using Agazaty.Data.Services.Interfaces;
-using Agazaty.Models;
+﻿
+using Agazaty.Application.Common.DTOs.AccountDTOs;
+
+using Agazaty.Application.Services.Interfaces;
+using Agazaty.Domain.Entities;
+using Agazaty.Domain.Repositories;
+using Agazaty.Shared.Contracts.Email.DTOs;
 using AutoMapper;
 using Humanizer;
 using Microsoft.AspNetCore.Authorization;
@@ -21,7 +22,7 @@ using System.Security.Claims;
 using System.Security.Cryptography.X509Certificates;
 using System.Text.Json;
 using System.Text.RegularExpressions;
-
+using static Agazaty.Shared.Utility.SD;
 namespace Agazaty.Controllers
 {
     [Route("api/[controller]")]
